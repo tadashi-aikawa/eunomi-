@@ -41,10 +41,7 @@ function init(e) {
   );
   doneButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
-    slack.send(
-      url,
-      `:heavy_check_mark: ${findEntryTitle()} \`⏰${findCurrentEntryTime()}\` \`🔖${findEntryClient() || ''}\``,
-    );
+    slack.send(url, `:completed: ${findEntryTitle()} \`⏰${findCurrentEntryTime()}\` \`🔖${findEntryClient() || ''}\``);
     timerButton.click();
   });
   timerDiv.appendChild(doneButton);
@@ -66,7 +63,7 @@ function init(e) {
   const onStatusUpdated = async () => {
     if (isCounting()) {
       const url = await getSlackIncomingWebhookUrl();
-      slack.send(url, `:jenkins_building: ${findEntryTitle()} \`🔖${findEntryClient() || ''}\``);
+      slack.send(url, `:tio: ${findEntryTitle()} \`🔖${findEntryClient() || ''}\``);
     }
     setButtonsVisibility();
   };
