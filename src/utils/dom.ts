@@ -1,5 +1,5 @@
-export function find(id: string): HTMLElement | null {
-  return document.getElementById(id);
+export function find<E extends HTMLElement>(id: string): E | null {
+  return document.getElementById(id) as E;
 }
 
 export function pick<E extends Element = Element>(selector: string): E | null {

@@ -8,9 +8,9 @@ import {
   findCurrentEntryTime,
 } from './clients/togglUi';
 import { div } from './utils/dom';
+import { getSlackIncomingWebhookUrl } from './utils/storage';
 
 function init(e) {
-  console.log('hoge');
   const timerDiv = findTimerDivElement();
   if (!timerDiv) {
     return;
@@ -28,8 +28,9 @@ function init(e) {
     `<button id="eumonia-resume-button" class="eunomia-button eunomia-button-resume">||</</button>`,
     'eunomia-button-div',
   );
-  resumeButton.addEventListener('click', () => {
-    slack.send(`:zzz_kirby: ${findEntryTitle()} \`⏰${findCurrentEntryTime()}\` \`🔖${findEntryClient() || ''}\``);
+  resumeButton.addEventListener('click', async () => {
+    const url = await getSlackIncomingWebhookUrl();
+    slack.send(url, `:zzz_kirby: ${findEntryTitle()} \`⏰${findCurrentEntryTime()}\` \`🔖${findEntryClient() || ''}\``);
     timerButton.click();
   });
   timerDiv.appendChild(resumeButton);
@@ -38,8 +39,10 @@ function init(e) {
     `<button id="eumonia-done-button" class="eunomia-button eunomia-button-done">✔</button>`,
     'eunomia-button-div',
   );
-  doneButton.addEventListener('click', () => {
+  doneButton.addEventListener('click', async () => {
+    const url = await getSlackIncomingWebhookUrl();
     slack.send(
+      url,
       `:heavy_check_mark: ${findEntryTitle()} \`⏰${findCurrentEntryTime()}\` \`🔖${findEntryClient() || ''}\``,
     );
     timerButton.click();
@@ -60,9 +63,10 @@ function init(e) {
     }
   };
 
-  const onStatusUpdated = () => {
+  const onStatusUpdated = async () => {
     if (isCounting()) {
-      slack.send(`:jenkins_building: ${findEntryTitle()} \`🔖${findEntryClient() || ''}\``);
+      const url = await getSlackIncomingWebhookUrl();
+      slack.send(url, `:jenkins_building: ${findEntryTitle()} \`🔖${findEntryClient() || ''}\``);
     }
     setButtonsVisibility();
   };

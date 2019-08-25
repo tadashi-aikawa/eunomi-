@@ -17,7 +17,7 @@
 
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://toggl.com/app/timer"],
       "js": ["js/vendor.js", "js/contents.js"],
       "css": ["index.css"]
     }
@@ -27,5 +27,5 @@
     "scripts": ["js/vendor.js", "js/background.js"]
   },
 
-  "permissions": ["storage", "<all_urls>"]
+  "permissions": ["storage", "https://hooks.slack.com/*"]
 }
