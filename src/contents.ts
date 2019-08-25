@@ -12,6 +12,13 @@ import {
 import { div } from './utils/dom';
 import { getSlackIncomingWebhookUrl } from './utils/storage';
 
+const toClientLabel = (): string => {
+  const entry = findEntryClient();
+  return entry ? `\`🔖${entry}\`` : '';
+};
+
+const toTimeLabel = (): string => `\`⏰${findCurrentEntryTime()}\``;
+
 /**
  * DeleteEntryButtonが出現したら一度だけイベントをセットする
  */
@@ -52,7 +59,7 @@ function init(e) {
   );
   resumeButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
-    slack.send(url, `:zzz_kirby: ${findEntryTitle()} \`⏰${findCurrentEntryTime()}\` \`🔖${findEntryClient() || ''}\``);
+    slack.send(url, `:zzz_kirby: ${findEntryTitle()} ${toTimeLabel()} ${toClientLabel()}`);
     timerButton.click();
   });
   timerDiv.appendChild(resumeButton);
@@ -63,7 +70,7 @@ function init(e) {
   );
   doneButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
-    slack.send(url, `:completed: ${findEntryTitle()} \`⏰${findCurrentEntryTime()}\` \`🔖${findEntryClient() || ''}\``);
+    slack.send(url, `:completed: ${findEntryTitle()} ${toTimeLabel()} ${toClientLabel()}`);
     timerButton.click();
   });
   timerDiv.appendChild(doneButton);
@@ -92,7 +99,7 @@ function init(e) {
   const onStatusUpdated = async () => {
     if (isCounting()) {
       const url = await getSlackIncomingWebhookUrl();
-      slack.send(url, `:tio: ${findEntryTitle()} \`🔖${findEntryClient() || ''}\``);
+      slack.send(url, `:tio: ${findEntryTitle()} ${toClientLabel()}`);
     }
     setByState();
   };

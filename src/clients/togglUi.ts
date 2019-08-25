@@ -2,9 +2,6 @@ import { pick } from '../utils/dom';
 
 // タイトル
 const findTitleElement = (): HTMLTitleElement => pick('html > head > title');
-export const findCurrentEntryTime = (): string => {
-  return findTitleElement().textContent.match(/^([^-]+) - .+/)[1];
-};
 
 // 実行中エントリのタイトル
 const TIME_ENTRY_TITLE_SELECTOR = '.TimerContainer__timerContainer form > input';
@@ -26,6 +23,11 @@ export const findEntryClient = (): string | null => {
   const elm = findEntryClientElement();
   return elm ? elm.textContent : null;
 };
+
+// 実行中タイマー
+const findTimeDurationElement = (): HTMLSpanElement => pick('.Timer__duration > .time-format-utils__duration');
+export const findCurrentEntryTime = (): string => findTimeDurationElement().textContent;
+// return findTitleElement().textContent.match(/^([^-]+) - .+/)[1];
 
 // 開始/終了ボタン
 const TIMER_BUTTON_SELECTOR = '.Timer__button';
