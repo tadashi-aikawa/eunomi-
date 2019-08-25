@@ -32,6 +32,14 @@ const TIMER_BUTTON_SELECTOR = '.Timer__button';
 export const findTimerButtonElement = (): HTMLButtonElement => pick(TIMER_BUTTON_SELECTOR);
 export const isCounting = (): boolean => findTimerButtonElement().getAttribute('title') !== 'Start time entry';
 
+// 削除ボタン
+const DELETE_ENTRY_BUTTON_SELECTOR = '.Delete__button';
+export const findDeleteEntryButtonElement = (): HTMLButtonElement => pick(DELETE_ENTRY_BUTTON_SELECTOR);
+
 // タイマーボタンがある領域
 const TIMER_DIV_SELECTOR = '.Timer__timer';
 export const findTimerDivElement = (): HTMLDivElement => pick(TIMER_DIV_SELECTOR);
+
+// タイマーコンテンツほぼ全体
+const TIMER_CONTAINER_SELECTOR = '.TimerContainer__timerContainer';
+export const findTimerContainerElement = (): HTMLDivElement => pick(TIMER_CONTAINER_SELECTOR);

@@ -6,9 +6,31 @@ import {
   findTimerDivElement,
   isCounting,
   findCurrentEntryTime,
+  findDeleteEntryButtonElement,
+  findTimerContainerElement,
 } from './clients/togglUi';
 import { div } from './utils/dom';
 import { getSlackIncomingWebhookUrl } from './utils/storage';
+
+/**
+ * DeleteEntryButtonが出現したら一度だけイベントをセットする
+ */
+function registerDeleteEntryButtonObserver() {
+  const deleteEntryButtonObserver = new MutationObserver(() => {
+    const deleteEntryButton = findDeleteEntryButtonElement();
+    if (!deleteEntryButton) {
+      return;
+    }
+
+    deleteEntryButton.addEventListener('click', async () => {
+      const url = await getSlackIncomingWebhookUrl();
+      slack.send(url, `:tio: :fukidashi1: 無かったことにします`);
+    });
+
+    deleteEntryButtonObserver.disconnect();
+  });
+  deleteEntryButtonObserver.observe(findTimerContainerElement(), { childList: true, subtree: true });
+}
 
 function init(e) {
   const timerDiv = findTimerDivElement();
@@ -48,11 +70,15 @@ function init(e) {
 
   initObserver.disconnect();
 
-  const setButtonsVisibility = () => {
+  /**
+   * カウント開始/停止の状態で、必ず必要な設定をする
+   */
+  const setByState = () => {
     if (isCounting()) {
       startButton.setAttribute('style', 'display: none;');
       resumeButton.setAttribute('style', 'display: visible;');
       doneButton.setAttribute('style', 'display: visible;');
+      registerDeleteEntryButtonObserver();
     } else {
       startButton.setAttribute('style', 'display: visible;');
       resumeButton.setAttribute('style', 'display: none;');
@@ -60,16 +86,19 @@ function init(e) {
     }
   };
 
+  /**
+   * カウント開始/停止の状態変わり目
+   */
   const onStatusUpdated = async () => {
     if (isCounting()) {
       const url = await getSlackIncomingWebhookUrl();
       slack.send(url, `:tio: ${findEntryTitle()} \`🔖${findEntryClient() || ''}\``);
     }
-    setButtonsVisibility();
+    setByState();
   };
 
   timerButton.setAttribute('style', 'display: none;');
-  setButtonsVisibility();
+  setByState();
 
   // Observerがつく前に変更があると開幕通知がいっがあるとため最後
   const timeButtonObserver = new MutationObserver(onStatusUpdated);
