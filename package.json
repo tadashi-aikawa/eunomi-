@@ -1,0 +1,36 @@
+{
+  "name": "Eunomiā",
+  "version": "0.1.0",
+  "description": "Eunomiā",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack --config webpack/webpack.dev.js --watch",
+    "build": "webpack --config webpack/webpack.prod.js",
+    "clean": "rm -rf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tadashi-aikawa/eunomia.git"
+  },
+  "keywords": [],
+  "author": "tadashi-aikawa",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tadashi-aikawa/eunomia/issues"
+  },
+  "homepage": "https://github.com/tadashi-aikawa/eunomia#readme",
+  "dependencies": {
+    "@slack/webhook": "^5.0.1",
+    "dayjs": "^1.8.15"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.88",
+    "copy-webpack-plugin": "^5.0.4",
+    "prettier": "^1.18.2",
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.5.3",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7",
+    "webpack-merge": "^4.2.1"
+  }
+}

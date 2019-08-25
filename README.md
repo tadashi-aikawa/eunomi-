@@ -1,2 +1,12 @@
-# eunomi-
 Eunomiā
+========
+
+## Development
+
+```bash
+npm i
+```
+
+```bash
+npm run dev
+```
