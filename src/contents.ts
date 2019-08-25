@@ -11,6 +11,9 @@ import {
 } from './clients/togglUi';
 import { div } from './utils/dom';
 import { getSlackIncomingWebhookUrl } from './utils/storage';
+import '@fortawesome/fontawesome-free/js/fontawesome';
+import '@fortawesome/fontawesome-free/js/solid';
+import '@fortawesome/fontawesome-free/js/regular';
 
 const toClientLabel = (): string => {
   const entry = findEntryClient();
@@ -47,14 +50,14 @@ function init(e) {
   const timerButton = findTimerButtonElement();
 
   const startButton = div(
-    `<button id="eumonia-start-button" class="eunomia-button eunomia-button-start">▶</button>`,
+    `<i class="fas fa-play-circle fa-3x ebutton ebutton-start" id="eumonia-resume-button"></i>`,
     'eunomia-button-div',
   );
   startButton.addEventListener('click', () => timerButton.click());
   timerDiv.appendChild(startButton);
 
   const resumeButton = div(
-    `<button id="eumonia-resume-button" class="eunomia-button eunomia-button-resume">||</</button>`,
+    `<i class="fas fa-pause-circle fa-3x ebutton ebutton-resume" id="eumonia-resume-button"></i>`,
     'eunomia-button-div',
   );
   resumeButton.addEventListener('click', async () => {
@@ -65,7 +68,7 @@ function init(e) {
   timerDiv.appendChild(resumeButton);
 
   const doneButton = div(
-    `<button id="eumonia-done-button" class="eunomia-button eunomia-button-done">✔</button>`,
+    `<i class="fas fa-check-circle fa-3x ebutton ebutton-done" id="eumonia-done-button"></i>`,
     'eunomia-button-div',
   );
   doneButton.addEventListener('click', async () => {

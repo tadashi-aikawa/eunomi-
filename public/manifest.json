@@ -19,7 +19,7 @@
     {
       "matches": ["https://toggl.com/app/timer"],
       "js": ["js/vendor.js", "js/contents.js"],
-      "css": ["index.css"]
+      "css": ["index.css", "fontawesome.css", "solid.css", "brands.css"]
     }
   ],
 
