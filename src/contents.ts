@@ -8,6 +8,7 @@ import {
   findCurrentEntryTime,
   findDeleteEntryButtonElement,
   findTimerContainerElement,
+  findEntryProject,
 } from './clients/togglUi';
 import { div } from './utils/dom';
 import { getSlackIncomingWebhookUrl, getJiraBrowserUrl } from './utils/storage';
@@ -19,13 +20,20 @@ const trimBracketContents = (text: string): string => text.replace(/\(.+\)/, '')
 
 const toClientLabel = (): string => {
   const entry = trimBracketContents(findEntryClient());
-  return entry ? `\`🔖${entry}\`` : '';
+  return entry ? `\`👥${entry}\`` : '';
 };
 
-const toTimeLabel = (): string => `\`⏰${findCurrentEntryTime()}\``;
+const toProjectLabel = (): string => {
+  const entry = trimBracketContents(findEntryProject());
+  return entry ? `\`📂${entry}\`` : '';
+};
+
+const toTimeLabel = (): string => `\`⏱${findCurrentEntryTime()}\``;
 
 const appendJiraLink = (text: string, jiraBrowserUrl: string): string =>
   jiraBrowserUrl ? text.replace(/^([^-]+-[0-9]+) /, `<${jiraBrowserUrl}/$1|$1> `) : text;
+
+const decorate = async (text: string): Promise<string> => `${appendJiraLink(text, await getJiraBrowserUrl())}`;
 
 /**
  * DeleteEntryButtonが出現したら一度だけイベントをセットする
@@ -69,7 +77,7 @@ function init(e) {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
       url,
-      `:zzz_kirby: ${appendJiraLink(findEntryTitle(), await getJiraBrowserUrl())} ${toTimeLabel()} ${toClientLabel()}`,
+      `:zzz_kirby: ${await decorate(findEntryTitle())} ${toTimeLabel()}  ${toClientLabel()} > ${toProjectLabel()}`,
     );
     timerButton.click();
   });
@@ -83,7 +91,7 @@ function init(e) {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
       url,
-      `:completed: ${appendJiraLink(findEntryTitle(), await getJiraBrowserUrl())} ${toTimeLabel()} ${toClientLabel()}`,
+      `:completed: ${await decorate(findEntryTitle())} ${toTimeLabel()}  ${toClientLabel()} > ${toProjectLabel()}`,
     );
     timerButton.click();
   });
@@ -113,7 +121,7 @@ function init(e) {
   const onStatusUpdated = async () => {
     if (isCounting()) {
       const url = await getSlackIncomingWebhookUrl();
-      slack.send(url, `:tio: ${appendJiraLink(findEntryTitle(), await getJiraBrowserUrl())} ${toClientLabel()}`);
+      slack.send(url, `:tio: ${await decorate(findEntryTitle())}  ${toClientLabel()} > ${toProjectLabel()}`);
     }
     setByState();
   };
