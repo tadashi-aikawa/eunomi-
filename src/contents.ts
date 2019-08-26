@@ -93,7 +93,7 @@ function init(e) {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
       url,
-      `　:unitychan_ok:\`完了\` ${toTimeLabel()}  ${await decorate(
+      `　:renne:\`完了\` ${toTimeLabel()}  ${await decorate(
         findEntryTitle(),
       )}    ${toClientLabel()}${toProjectLabel()}`,
     );
