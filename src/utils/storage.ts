@@ -1,8 +1,10 @@
 interface Options {
   slackIncomingWebhookUrl: string;
+  jiraBrowserUrl: string;
 }
 const DEFAULT_OPTIONS: Options = {
   slackIncomingWebhookUrl: '',
+  jiraBrowserUrl: '',
 };
 
 /**
@@ -26,6 +28,31 @@ export async function getSlackIncomingWebhookUrl(): Promise<string> {
   return new Promise((resolve, reject) => {
     chrome.storage.sync.get(DEFAULT_OPTIONS, (options: Options) => {
       resolve(options.slackIncomingWebhookUrl);
+    });
+  });
+}
+
+/**
+ * Set Jira browser URL to local storage
+ * @param jiraBrowserUrl
+ * @return isSuccess
+ */
+export async function setJiraBrowserUrl(jiraBrowserUrl: string): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.set({ jiraBrowserUrl }, () => {
+      resolve(true);
+    });
+  });
+}
+
+/**
+ * Get Jira browser URL from local storage
+ * @return Jira browser URL
+ */
+export async function getJiraBrowserUrl(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get(DEFAULT_OPTIONS, (options: Options) => {
+      resolve(options.jiraBrowserUrl);
     });
   });
 }

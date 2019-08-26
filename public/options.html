@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
     <title>Settings</title>
     <script src="js/vendor.js"></script>
   </head>
 
   <body>
-    Slack Incoming Webhook Token:
-    <input type="password" id="slack-incoming-webhook-token" />
-    <button id="save">Save</button>
+    <p>
+      🔨 Slack Incoming Webhook Token
+    </p>
+    <input
+      id="slack-incoming-webhook-url"
+      placeholder="https://hooks.slack.com/services/.../...../..."
+      style="width: 400px;"
+    />
+    <p>🔨 Jira browser URL</p>
+    <input id="jira-browser-url" placeholder="https://jira.example.jp/browse" style="width: 400px;" />
+    <div style="padding: 15px;">
+      <button id="save">Save</button>
+    </div>
     <div id="debug"></div>
 
     <script src="js/options.js"></script>

@@ -1,16 +1,23 @@
 import { find } from './utils/dom';
-import { setSlackIncomingWebhookUrl, getSlackIncomingWebhookUrl } from './utils/storage';
+import {
+  setSlackIncomingWebhookUrl,
+  getSlackIncomingWebhookUrl,
+  setJiraBrowserUrl,
+  getJiraBrowserUrl,
+} from './utils/storage';
 
 const saveButton = find('save');
-const slackIncomingWebhookInput = find<HTMLInputElement>('slack-incoming-webhook-token');
+const slackIncomingWebhookInput = find<HTMLInputElement>('slack-incoming-webhook-url');
+const jiraBrowserUrlInput = find<HTMLInputElement>('jira-browser-url');
 
 async function saveOptions() {
-  const isSuccess = await setSlackIncomingWebhookUrl(slackIncomingWebhookInput.value);
+  await setSlackIncomingWebhookUrl(slackIncomingWebhookInput.value);
+  await setJiraBrowserUrl(jiraBrowserUrlInput.value);
 }
 
 async function restoreOptions() {
-  const url = await getSlackIncomingWebhookUrl();
-  slackIncomingWebhookInput.value = url;
+  slackIncomingWebhookInput.value = await getSlackIncomingWebhookUrl();
+  jiraBrowserUrlInput.value = await getJiraBrowserUrl();
 }
 
 saveButton.addEventListener('click', saveOptions);

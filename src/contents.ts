@@ -10,7 +10,7 @@ import {
   findTimerContainerElement,
 } from './clients/togglUi';
 import { div } from './utils/dom';
-import { getSlackIncomingWebhookUrl } from './utils/storage';
+import { getSlackIncomingWebhookUrl, getJiraBrowserUrl } from './utils/storage';
 import '@fortawesome/fontawesome-free/js/fontawesome';
 import '@fortawesome/fontawesome-free/js/solid';
 import '@fortawesome/fontawesome-free/js/regular';
@@ -21,6 +21,9 @@ const toClientLabel = (): string => {
 };
 
 const toTimeLabel = (): string => `\`⏰${findCurrentEntryTime()}\``;
+
+const appendJiraLink = (text: string, jiraBrowserUrl: string): string =>
+  jiraBrowserUrl ? text.replace(/^([^-]+-[0-9]+) /, `<${jiraBrowserUrl}/$1|$1> `) : text;
 
 /**
  * DeleteEntryButtonが出現したら一度だけイベントをセットする
@@ -62,7 +65,10 @@ function init(e) {
   );
   resumeButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
-    slack.send(url, `:zzz_kirby: ${findEntryTitle()} ${toTimeLabel()} ${toClientLabel()}`);
+    slack.send(
+      url,
+      `:zzz_kirby: ${appendJiraLink(findEntryTitle(), await getJiraBrowserUrl())} ${toTimeLabel()} ${toClientLabel()}`,
+    );
     timerButton.click();
   });
   timerDiv.appendChild(resumeButton);
@@ -73,7 +79,10 @@ function init(e) {
   );
   doneButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
-    slack.send(url, `:completed: ${findEntryTitle()} ${toTimeLabel()} ${toClientLabel()}`);
+    slack.send(
+      url,
+      `:completed: ${appendJiraLink(findEntryTitle(), await getJiraBrowserUrl())} ${toTimeLabel()} ${toClientLabel()}`,
+    );
     timerButton.click();
   });
   timerDiv.appendChild(doneButton);
@@ -102,7 +111,7 @@ function init(e) {
   const onStatusUpdated = async () => {
     if (isCounting()) {
       const url = await getSlackIncomingWebhookUrl();
-      slack.send(url, `:tio: ${findEntryTitle()} ${toClientLabel()}`);
+      slack.send(url, `:tio: ${appendJiraLink(findEntryTitle(), await getJiraBrowserUrl())} ${toClientLabel()}`);
     }
     setByState();
   };
