@@ -1,7 +1,7 @@
 {
-  "name": "eunomia",
+  "name": "togowl",
   "version": "0.1.0",
-  "description": "Eunomiā",
+  "description": "A Google Chrome extension for toggl 🦉",
   "main": "index.js",
   "scripts": {
     "dev": "webpack --config webpack/webpack.dev.js --watch",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tadashi-aikawa/eunomia.git"
+    "url": "git+https://github.com/tadashi-aikawa/togowl.git"
   },
   "keywords": [],
   "author": "tadashi-aikawa",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tadashi-aikawa/eunomia/issues"
+    "url": "https://github.com/tadashi-aikawa/togowl/issues"
   },
-  "homepage": "https://github.com/tadashi-aikawa/eunomia#readme",
+  "homepage": "https://github.com/tadashi-aikawa/togowl#readme",
   "dependencies": {
     "@slack/webhook": "^5.0.1",
     "dayjs": "^1.8.15"

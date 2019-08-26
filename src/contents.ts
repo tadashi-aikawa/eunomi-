@@ -54,14 +54,14 @@ function init(e) {
 
   const startButton = div(
     `<i class="fas fa-play-circle fa-3x ebutton ebutton-start" id="eumonia-resume-button"></i>`,
-    'eunomia-button-div',
+    'togowl-button-div',
   );
   startButton.addEventListener('click', () => timerButton.click());
   timerDiv.appendChild(startButton);
 
   const resumeButton = div(
     `<i class="fas fa-pause-circle fa-3x ebutton ebutton-resume" id="eumonia-resume-button"></i>`,
-    'eunomia-button-div',
+    'togowl-button-div',
   );
   resumeButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
@@ -75,7 +75,7 @@ function init(e) {
 
   const doneButton = div(
     `<i class="fas fa-check-circle fa-3x ebutton ebutton-done" id="eumonia-done-button"></i>`,
-    'eunomia-button-div',
+    'togowl-button-div',
   );
   doneButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
