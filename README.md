@@ -1,5 +1,7 @@
-Eunomiā
-========
+Togowl
+======
+
+A Google Chrome extension for Toggl and Owl! :owl:
 
 ## Development
 
