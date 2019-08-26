@@ -19,13 +19,13 @@ import '@fortawesome/fontawesome-free/js/regular';
 const trimBracketContents = (text: string): string => text.replace(/\(.+\)/, '');
 
 const toClientLabel = (): string => {
-  const entry = trimBracketContents(findEntryClient());
-  return entry ? `\`👥${entry}\`` : '';
+  const entry = findEntryClient();
+  return entry ? `\`👥${trimBracketContents(entry)}\` > ` : '';
 };
 
 const toProjectLabel = (): string => {
-  const entry = trimBracketContents(findEntryProject());
-  return entry ? `\`📂${entry}\`` : '';
+  const entry = findEntryProject();
+  return entry ? `\`📂${trimBracketContents(entry)}\`` : '';
 };
 
 const toTimeLabel = (): string => `\`⏱${findCurrentEntryTime()}\``;
@@ -77,7 +77,9 @@ function init(e) {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
       url,
-      `:zzz_kirby: ${await decorate(findEntryTitle())} ${toTimeLabel()}  ${toClientLabel()} > ${toProjectLabel()}`,
+      `　:zzz_kirby:\`中断\` ${toTimeLabel()}  ${await decorate(
+        findEntryTitle(),
+      )}    ${toClientLabel()}${toProjectLabel()}`,
     );
     timerButton.click();
   });
@@ -91,7 +93,9 @@ function init(e) {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
       url,
-      `:completed: ${await decorate(findEntryTitle())} ${toTimeLabel()}  ${toClientLabel()} > ${toProjectLabel()}`,
+      `　:unitychan_ok:\`完了\` ${toTimeLabel()}  ${await decorate(
+        findEntryTitle(),
+      )}    ${toClientLabel()}${toProjectLabel()}`,
     );
     timerButton.click();
   });
@@ -121,7 +125,7 @@ function init(e) {
   const onStatusUpdated = async () => {
     if (isCounting()) {
       const url = await getSlackIncomingWebhookUrl();
-      slack.send(url, `:tio: ${await decorate(findEntryTitle())}  ${toClientLabel()} > ${toProjectLabel()}`);
+      slack.send(url, `:tio:\`開始\`  ${await decorate(findEntryTitle())}    ${toClientLabel()}${toProjectLabel()}`);
     }
     setByState();
   };
