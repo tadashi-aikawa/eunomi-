@@ -15,8 +15,10 @@ import '@fortawesome/fontawesome-free/js/fontawesome';
 import '@fortawesome/fontawesome-free/js/solid';
 import '@fortawesome/fontawesome-free/js/regular';
 
+const trimBracketContents = (text: string): string => text.replace(/\(.+\)/, '');
+
 const toClientLabel = (): string => {
-  const entry = findEntryClient();
+  const entry = trimBracketContents(findEntryClient());
   return entry ? `\`🔖${entry}\`` : '';
 };
 
