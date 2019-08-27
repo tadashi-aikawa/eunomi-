@@ -55,6 +55,10 @@ function registerDeleteEntryButtonObserver() {
   deleteEntryButtonObserver.observe(findTimerContainerElement(), { childList: true, subtree: true });
 }
 
+/**
+ * 初期化処理
+ * @param e
+ */
 function init(e) {
   console.log('init');
   const timerDiv = findTimerDivElement();
@@ -76,6 +80,7 @@ function init(e) {
         findEntryTitle(),
       )}    ${toClientLabel()}${toProjectLabel()}`,
     );
+    timerButton.click();
   });
   timerDiv.appendChild(resumeButton);
 
