@@ -25,12 +25,12 @@ export const findEntryClient = (): string | null => {
 };
 
 // 実行中タイマー
-const findTimeDurationElement = (): HTMLSpanElement => pick('.Timer__duration > .time-format-utils__duration');
+const findTimeDurationElement = (): HTMLSpanElement => pick('.time-format-utils__duration');
 export const findCurrentEntryTime = (): string => findTimeDurationElement().textContent;
 // return findTitleElement().textContent.match(/^([^-]+) - .+/)[1];
 
 // 開始/終了ボタン
-const TIMER_BUTTON_SELECTOR = '.Timer__button';
+const TIMER_BUTTON_SELECTOR = 'div[data-dom-element-id="timer-button"]';
 export const findTimerButtonElement = (): HTMLButtonElement => pick(TIMER_BUTTON_SELECTOR);
 export const isCounting = (): boolean => findTimerButtonElement().getAttribute('title') !== 'Start time entry';
 
@@ -39,7 +39,8 @@ const DELETE_ENTRY_BUTTON_SELECTOR = '.Delete__button';
 export const findDeleteEntryButtonElement = (): HTMLButtonElement => pick(DELETE_ENTRY_BUTTON_SELECTOR);
 
 // タイマーボタンがある領域
-const TIMER_DIV_SELECTOR = '.Timer__timer';
+// const TIMER_DIV_SELECTOR = '.css-y6rqg9';
+const TIMER_DIV_SELECTOR = '.TimerFormProject__container + div + div + div';
 export const findTimerDivElement = (): HTMLDivElement => pick(TIMER_DIV_SELECTOR);
 
 // タイマーコンテンツほぼ全体

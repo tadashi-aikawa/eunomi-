@@ -56,23 +56,18 @@ function registerDeleteEntryButtonObserver() {
 }
 
 function init(e) {
+  console.log('init');
   const timerDiv = findTimerDivElement();
   if (!timerDiv) {
     return;
   }
   const timerButton = findTimerButtonElement();
 
-  const startButton = div(
-    `<i class="fas fa-play-circle fa-3x ebutton ebutton-start" id="eumonia-resume-button"></i>`,
-    'togowl-button-div',
-  );
+  const startButton = div(`<i class="fas fa-play-circle fa-3x ebutton ebutton-start"></i>`, 'togowl-button-div');
   startButton.addEventListener('click', () => timerButton.click());
   timerDiv.appendChild(startButton);
 
-  const resumeButton = div(
-    `<i class="fas fa-pause-circle fa-3x ebutton ebutton-resume" id="eumonia-resume-button"></i>`,
-    'togowl-button-div',
-  );
+  const resumeButton = div(`<i class="fas fa-pause-circle fa-3x ebutton ebutton-resume"></i>`, 'togowl-button-div');
   resumeButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
@@ -81,14 +76,27 @@ function init(e) {
         findEntryTitle(),
       )}    ${toClientLabel()}${toProjectLabel()}`,
     );
-    timerButton.click();
   });
   timerDiv.appendChild(resumeButton);
 
-  const doneButton = div(
-    `<i class="fas fa-check-circle fa-3x ebutton ebutton-done" id="eumonia-done-button"></i>`,
-    'togowl-button-div',
-  );
+  const interruptButton = div(`<i class="fas fa-skull fa-3x ebutton ebutton-interrupt"></i>`, 'togowl-button-div');
+  interruptButton.addEventListener('click', async () => {
+    const url = await getSlackIncomingWebhookUrl();
+    slack.send(
+      url,
+      `　:denwaneko:\`割込中断\` ${toTimeLabel()}  ${await decorate(
+        findEntryTitle(),
+      )}    ${toClientLabel()}${toProjectLabel()}`,
+    );
+    timerButton.click();
+    setTimeout(() => {
+      timerButton.click();
+      slack.send(url, `　:genbaneko::fukidashi3:現場は急ぎ対応中！ 報告は後ほどでﾖｼ!`);
+    }, 2000);
+  });
+  timerDiv.appendChild(interruptButton);
+
+  const doneButton = div(`<i class="fas fa-check-circle fa-3x ebutton ebutton-done"></i>`, 'togowl-button-div');
   doneButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
@@ -110,11 +118,13 @@ function init(e) {
     if (isCounting()) {
       startButton.setAttribute('style', 'display: none;');
       resumeButton.setAttribute('style', 'display: visible;');
+      interruptButton.setAttribute('style', 'display: visible;');
       doneButton.setAttribute('style', 'display: visible;');
       registerDeleteEntryButtonObserver();
     } else {
       startButton.setAttribute('style', 'display: visible;');
       resumeButton.setAttribute('style', 'display: none;');
+      interruptButton.setAttribute('style', 'display: none;');
       doneButton.setAttribute('style', 'display: none;');
     }
   };
