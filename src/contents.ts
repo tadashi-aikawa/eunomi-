@@ -47,7 +47,7 @@ function registerDeleteEntryButtonObserver() {
 
     deleteEntryButton.addEventListener('click', async () => {
       const url = await getSlackIncomingWebhookUrl();
-      slack.send(url, `:tio: :fukidashi1: 無かったことにします`);
+      slack.send(url, `　:tio2: \`取消\` ${await decorate(findEntryTitle())}    ${toClientLabel()}${toProjectLabel()}`);
     });
 
     deleteEntryButtonObserver.disconnect();
@@ -90,16 +90,18 @@ function init(e) {
   );
   interruptButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
+    slack.send(url, `　:denwaneko:\`割込発生\`:fukidashi3::doushite:`);
     slack.send(
       url,
-      `　:denwaneko:\`割込中断\` ${toTimeLabel()}  ${await decorate(
+      `　:genbaneko:\`強制中断\` ${toTimeLabel()}  ${await decorate(
         findEntryTitle(),
       )}    ${toClientLabel()}${toProjectLabel()}`,
     );
     timerButton.click();
+    silentIfStartCount = true;
     setTimeout(() => {
       timerButton.click();
-      slack.send(url, `　:genbaneko::fukidashi3:現場は急ぎ対応中！ 報告は後ほどでﾖｼ!`);
+      slack.send(url, `　:genbaneko::fukidashi3:現場は急ぎ対応中！ 報告は後で:yoshi:`);
     }, 2000);
   });
   timerDiv.appendChild(interruptButton);
@@ -137,13 +139,19 @@ function init(e) {
     }
   };
 
+  // カウント開始時に通知をしないフラグ
+  let silentIfStartCount = false;
+
   /**
    * カウント開始/停止の状態変わり目
    */
   const onStatusUpdated = async () => {
     if (isCounting()) {
-      const url = await getSlackIncomingWebhookUrl();
-      slack.send(url, `:tio:\`開始\`  ${await decorate(findEntryTitle())}    ${toClientLabel()}${toProjectLabel()}`);
+      if (!silentIfStartCount) {
+        const url = await getSlackIncomingWebhookUrl();
+        slack.send(url, `:tio:\`開始\`  ${await decorate(findEntryTitle())}    ${toClientLabel()}${toProjectLabel()}`);
+      }
+      silentIfStartCount = false;
     }
     setByState();
   };
