@@ -71,8 +71,8 @@ function init(e) {
   startButton.addEventListener('click', () => timerButton.click());
   timerDiv.appendChild(startButton);
 
-  const resumeButton = div(`<i class="fas fa-pause-circle fa-3x ebutton ebutton-resume"></i>`, 'togowl-button-div');
-  resumeButton.addEventListener('click', async () => {
+  const pauseButton = div(`<i class="fas fa-pause-circle fa-3x ebutton ebutton-pause"></i>`, 'togowl-button-div');
+  pauseButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
       url,
@@ -82,7 +82,7 @@ function init(e) {
     );
     timerButton.click();
   });
-  timerDiv.appendChild(resumeButton);
+  timerDiv.appendChild(pauseButton);
 
   const interruptButton = div(`<i class="fas fa-skull fa-3x ebutton ebutton-interrupt"></i>`, 'togowl-button-div');
   interruptButton.addEventListener('click', async () => {
@@ -122,13 +122,13 @@ function init(e) {
   const setByState = () => {
     if (isCounting()) {
       startButton.setAttribute('style', 'display: none;');
-      resumeButton.setAttribute('style', 'display: visible;');
+      pauseButton.setAttribute('style', 'display: visible;');
       interruptButton.setAttribute('style', 'display: visible;');
       doneButton.setAttribute('style', 'display: visible;');
       registerDeleteEntryButtonObserver();
     } else {
       startButton.setAttribute('style', 'display: visible;');
-      resumeButton.setAttribute('style', 'display: none;');
+      pauseButton.setAttribute('style', 'display: none;');
       interruptButton.setAttribute('style', 'display: none;');
       doneButton.setAttribute('style', 'display: none;');
     }
