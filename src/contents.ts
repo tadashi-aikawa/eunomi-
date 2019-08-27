@@ -84,7 +84,10 @@ function init(e) {
   });
   timerDiv.appendChild(pauseButton);
 
-  const interruptButton = div(`<i class="fas fa-skull fa-3x ebutton ebutton-interrupt"></i>`, 'togowl-button-div');
+  const interruptButton = div(
+    `<i class="fas fa-exclamation-circle fa-3x ebutton ebutton-interrupt"></i>`,
+    'togowl-button-div',
+  );
   interruptButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(

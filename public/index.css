@@ -23,6 +23,10 @@
   color: tomato;
 }
 
+.ebutton-interrupt {
+  color: blueviolet;
+}
+
 .ebutton-done {
   color: mediumseagreen;
 }
