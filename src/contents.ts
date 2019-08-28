@@ -18,22 +18,21 @@ import '@fortawesome/fontawesome-free/js/regular';
 
 const trimBracketContents = (text: string): string => text.replace(/\(.+\)/, '');
 
+const decorate = async (text: string): Promise<string> => `${appendJiraLink(text, await getJiraBrowserUrl())}`;
+
 const toClientLabel = (): string => {
   const entry = findEntryClient();
   return entry ? `\`👥${trimBracketContents(entry)}\` > ` : '';
 };
-
 const toProjectLabel = (): string => {
   const entry = findEntryProject();
   return entry ? `\`📂${trimBracketContents(entry)}\`` : '';
 };
-
+const toEntryTitle = async (): Promise<string> => await decorate(findEntryTitle());
 const toTimeLabel = (): string => `\`⏱${findCurrentEntryTime()}\``;
 
 const appendJiraLink = (text: string, jiraBrowserUrl: string): string =>
   jiraBrowserUrl ? text.replace(/^([^-]+-[0-9]+) /, `<${jiraBrowserUrl}/$1|$1> `) : text;
-
-const decorate = async (text: string): Promise<string> => `${appendJiraLink(text, await getJiraBrowserUrl())}`;
 
 /**
  * DeleteEntryButtonが出現したら一度だけイベントをセットする
@@ -47,7 +46,7 @@ function registerDeleteEntryButtonObserver() {
 
     deleteEntryButton.addEventListener('click', async () => {
       const url = await getSlackIncomingWebhookUrl();
-      slack.send(url, `　:tio2: \`取消\` ${await decorate(findEntryTitle())}    ${toClientLabel()}${toProjectLabel()}`);
+      slack.send(url, `:tio2: \`取消\` ${await toEntryTitle()}    ${toClientLabel()}${toProjectLabel()}`);
     });
 
     deleteEntryButtonObserver.disconnect();
@@ -76,9 +75,7 @@ function init(e) {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
       url,
-      `　:zzz_kirby:\`中断\` ${toTimeLabel()}  ${await decorate(
-        findEntryTitle(),
-      )}    ${toClientLabel()}${toProjectLabel()}`,
+      `:zzz_kirby:\`中断\` ${toTimeLabel()}  ${await toEntryTitle()}    ${toClientLabel()}${toProjectLabel()}`,
     );
     timerButton.click();
   });
@@ -90,18 +87,16 @@ function init(e) {
   );
   interruptButton.addEventListener('click', async () => {
     const url = await getSlackIncomingWebhookUrl();
-    slack.send(url, `　:denwaneko:\`割込発生\`:fukidashi3::doushite:`);
-    slack.send(
+    await slack.send(url, `:denwaneko:\`割込発生\`:fukidashi3::doushite:`);
+    await slack.send(
       url,
-      `　:genbaneko:\`強制中断\` ${toTimeLabel()}  ${await decorate(
-        findEntryTitle(),
-      )}    ${toClientLabel()}${toProjectLabel()}`,
+      `　:genbaneko:\`強制中断\` ${toTimeLabel()}  ${await toEntryTitle()}    ${toClientLabel()}${toProjectLabel()}`,
     );
     timerButton.click();
     silentIfStartCount = true;
-    setTimeout(() => {
+    await setTimeout(async () => {
       timerButton.click();
-      slack.send(url, `　:genbaneko::fukidashi3:現場は急ぎ対応中！ 報告は後で:yoshi:`);
+      await slack.send(url, `　:genbaneko::fukidashi3:現場は急ぎ対応中！ 報告は後で:yoshi:`);
     }, 2000);
   });
   timerDiv.appendChild(interruptButton);
@@ -111,9 +106,7 @@ function init(e) {
     const url = await getSlackIncomingWebhookUrl();
     slack.send(
       url,
-      `　:renne:\`完了\` ${toTimeLabel()}  ${await decorate(
-        findEntryTitle(),
-      )}    ${toClientLabel()}${toProjectLabel()}`,
+      `:renne:\`完了\` ${toTimeLabel()}  ${await toEntryTitle()}    ${toClientLabel()}${toProjectLabel()}`,
     );
     timerButton.click();
   });
@@ -149,7 +142,7 @@ function init(e) {
     if (isCounting()) {
       if (!silentIfStartCount) {
         const url = await getSlackIncomingWebhookUrl();
-        slack.send(url, `:tio:\`開始\`  ${await decorate(findEntryTitle())}    ${toClientLabel()}${toProjectLabel()}`);
+        slack.send(url, `:tio:\`開始\`  ${await toEntryTitle()}    ${toClientLabel()}${toProjectLabel()}`);
       }
       silentIfStartCount = false;
     }
