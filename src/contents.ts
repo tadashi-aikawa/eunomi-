@@ -225,37 +225,38 @@ function init(e) {
     .setOnClickStartButtonListener(s => s.togglTimerButton.click())
     .setOnClickPauseButtonListener(async s => {
       await Notifier.notify(
-        (title, client, project, time) => `　:zzz_kirby:\`中断\` ${time}  ${title}    ${client}${project}`,
+        (title, client, project, time) => `:zzz_kirby: \`中断\` ${time}  ${title}    ${client}${project}`,
       );
       s.togglTimerButton.click();
     })
     .setOnClickInterruptButtonListener(async s => {
-      await Notifier.notify((title, client, project, time) => `　:denwaneko:\`割込発生\`:fukidashi3::doushite:`);
+      await Notifier.notify((title, client, project, time) => `:denwaneko: \`割込発生\`:fukidashi3::doushite:`);
 
       s.togglTimerButton.click();
 
       await Notifier.notify(
-        (title, client, project, time) => `　:genbaneko:\`強制中断\` ${time}  ${title}    ${client}${project}`,
+        (title, client, project, time) => `　:genbaneko: \`強制中断\` ${time}  ${title}    ${client}${project}`,
       );
 
       setTimeout(() => s.togglTimerButton.click(), 1000);
     })
     .setOnClickDoneButtonListener(async s => {
       await Notifier.notify(
-        (title, client, project, time) => `　:renne:\`完了\` ${time}  ${title}    ${client}${project}`,
+        (title, client, project, time) => `:renne: \`完了\` ${time}  ${title}    ${client}${project}`,
       );
       s.togglTimerButton.click();
     })
     .setOnClickDeleteButtonListener(async s => {
       await Notifier.notify(
-        (title, client, project, time) => `　:tio2:\`取消\` ${time}  ${title}    ${client}${project}`,
+        (title, client, project, time) =>
+          `:hyakutake_satori: \`やっぱナシで\` ${time}  ${title}    ${client}${project}`,
       );
       s.deleteEntry();
     })
     .setUpdateStatusListener(async s => {
-      contents.updateVisibility();
+      s.updateVisibility();
       if (isCounting() && !s.isTitleEmpty()) {
-        await Notifier.notify((title, client, project, time) => `:tio:\`開始\`  ${title}    ${client}${project}`);
+        await Notifier.notify((title, client, project, time) => `:tio2: \`開始\`  ${title}    ${client}${project}`);
       }
     })
     .setUpdateTitleListener(async s => {
