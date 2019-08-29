@@ -1,4 +1,5 @@
 import { pick } from '../utils/dom';
+import { toSeconds } from '../utils/time';
 
 // タイトル
 const findTitleElement = (): HTMLTitleElement => pick('html > head > title');
@@ -27,6 +28,7 @@ export const findEntryClient = (): string | null => {
 // 実行中タイマー
 const findTimeDurationElement = (): HTMLSpanElement => pick('.time-format-utils__duration');
 export const findCurrentEntryTime = (): string => findTimeDurationElement().textContent;
+export const findCurrentEntrySeconds = (): number => toSeconds(findTimeDurationElement().textContent);
 // return findTitleElement().textContent.match(/^([^-]+) - .+/)[1];
 
 // 開始/終了ボタン

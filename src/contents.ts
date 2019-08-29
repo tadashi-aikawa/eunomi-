@@ -10,6 +10,7 @@ import {
   findEntryProject,
   findEntryTitleElement,
   findEntryTitle,
+  findCurrentEntrySeconds,
 } from './clients/togglUi';
 import { div } from './utils/dom';
 import { getSlackIncomingWebhookUrl, getJiraBrowserUrl } from './utils/storage';
@@ -21,7 +22,7 @@ class Notifier {
   static async notify(
     builder: (title: string, client: string, project: string, time: string) => string,
   ): Promise<void> {
-    this.notifyToSlack(builder(await this.decorate(this.title()), this.client(), this.project(), this.time()));
+    await this.notifyToSlack(builder(await this.decorate(this.title()), this.client(), this.project(), this.time()));
   }
 
   private static trimBracketContents = (text: string): string => text.replace(/\(.+\)/, '');
@@ -43,7 +44,7 @@ class Notifier {
     `${Notifier.appendJiraLink(text, await getJiraBrowserUrl())}`;
 
   private static async notifyToSlack(message: string) {
-    slack.send(await getSlackIncomingWebhookUrl(), message);
+    await slack.send(await getSlackIncomingWebhookUrl(), message);
   }
   private static appendJiraLink(text: string, jiraBrowserUrl: string): string {
     return jiraBrowserUrl ? text.replace(/^([^-]+-[0-9]+) /, `<${jiraBrowserUrl}/$1|$1> `) : text;
@@ -248,21 +249,20 @@ function init(e) {
     })
     .setOnClickDeleteButtonListener(async s => {
       await Notifier.notify(
-        (title, client, project, time) =>
-          `:hyakutake_satori: \`やっぱナシで\` ${time}  ${title}    ${client}${project}`,
+        (title, client, project, time) => `:unitychan_ng: \`やっぱナシ\` ${time}  ${title}    ${client}${project}`,
       );
       s.deleteEntry();
     })
     .setUpdateStatusListener(async s => {
       s.updateVisibility();
-      if (isCounting() && !s.isTitleEmpty()) {
+      if (isCounting() && !s.isTitleEmpty() && findCurrentEntrySeconds() < 10) {
         await Notifier.notify((title, client, project, time) => `:tio2: \`開始\`  ${title}    ${client}${project}`);
       }
-    })
-    .setUpdateTitleListener(async s => {
-      // TODO:
-      // s.updateEnablity();
     });
+  // .setUpdateTitleListener(async s => {
+  // TODO:
+  // s.updateEnablity();
+  // });
 
   contents.updateVisibility();
 }
