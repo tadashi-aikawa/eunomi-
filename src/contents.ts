@@ -212,6 +212,8 @@ class TimerContents {
   }
 }
 
+const log = (message: string) => console.log(`${new Date()}: ${message}`);
+
 /**
  * 初期化処理
  * @param e
@@ -222,15 +224,21 @@ function init(e) {
   }
   initObserver.disconnect();
 
+  log('Add timer contents.');
   const contents = TimerContents.create()
-    .setOnClickStartButtonListener(s => s.togglTimerButton.click())
+    .setOnClickStartButtonListener(s => {
+      log('Start button clicked.');
+      s.togglTimerButton.click();
+    })
     .setOnClickPauseButtonListener(async s => {
+      log('Pause button clicked.');
       await Notifier.notify(
         (title, client, project, time) => `:zzz_kirby: \`中断\` ${time}  ${title}    ${client}${project}`,
       );
       s.togglTimerButton.click();
     })
     .setOnClickInterruptButtonListener(async s => {
+      log('Interrupt button clicked.');
       await Notifier.notify((title, client, project, time) => `:denwaneko: \`割込発生\`:fukidashi3::doushite:`);
 
       s.togglTimerButton.click();
@@ -242,18 +250,21 @@ function init(e) {
       setTimeout(() => s.togglTimerButton.click(), 1000);
     })
     .setOnClickDoneButtonListener(async s => {
+      log('Done button clicked.');
       await Notifier.notify(
         (title, client, project, time) => `:renne: \`完了\` ${time}  ${title}    ${client}${project}`,
       );
       s.togglTimerButton.click();
     })
     .setOnClickDeleteButtonListener(async s => {
+      log('Delete button clicked.');
       await Notifier.notify(
         (title, client, project, time) => `:unitychan_ng: \`やっぱナシ\` ${time}  ${title}    ${client}${project}`,
       );
       s.deleteEntry();
     })
     .setUpdateStatusListener(async s => {
+      log('Status updated.');
       s.updateVisibility();
       if (isCounting() && !s.isTitleEmpty() && findCurrentEntrySeconds() < 10) {
         await Notifier.notify((title, client, project, time) => `:tio2: \`開始\`  ${title}    ${client}${project}`);
