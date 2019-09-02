@@ -1,28 +1,49 @@
+import '@fortawesome/fontawesome-free/js/fontawesome';
+import '@fortawesome/fontawesome-free/js/regular';
+import '@fortawesome/fontawesome-free/js/solid';
 import * as slack from './clients/slack';
 import {
+  findCurrentEntrySeconds,
+  findCurrentEntryTime,
+  findDeleteEntryButtonElement,
   findEntryClient,
+  findEntryProject,
+  findEntryTitle,
+  findEntryTitleElement,
   findTimerButtonElement,
   findTimerDivElement,
   isCounting,
-  findCurrentEntryTime,
-  findDeleteEntryButtonElement,
-  findTimerContainerElement,
-  findEntryProject,
-  findEntryTitleElement,
-  findEntryTitle,
-  findCurrentEntrySeconds,
 } from './clients/togglUi';
 import { div } from './utils/dom';
-import { getSlackIncomingWebhookUrl, getJiraBrowserUrl } from './utils/storage';
-import '@fortawesome/fontawesome-free/js/fontawesome';
-import '@fortawesome/fontawesome-free/js/solid';
-import '@fortawesome/fontawesome-free/js/regular';
+import { getJiraBrowserUrl, getSlackIncomingWebhookUrl } from './utils/storage';
+
+enum Status {
+  START = 'start',
+  STOP = 'stop',
+}
 
 class Notifier {
-  static async notify(
-    builder: (title: string, client: string, project: string, time: string) => string,
-  ): Promise<void> {
-    await this.notifyToSlack(builder(await this.decorate(this.title()), this.client(), this.project(), this.time()));
+  private messageQueue: string[] = [];
+
+  async notify(builder: (title: string, client: string, project: string, time: string) => string): Promise<void> {
+    const message = builder(
+      await Notifier.decorate(Notifier.title()),
+      Notifier.client(),
+      Notifier.project(),
+      Notifier.time(),
+    );
+    this.messageQueue.push(message);
+    log(`Pushed ${message} to queue.`);
+
+    this.notifyToSlack();
+  }
+
+  private async notifyToSlack() {
+    while (this.messageQueue.length > 0) {
+      const message = this.messageQueue.shift();
+      await slack.send(await getSlackIncomingWebhookUrl(), message);
+      log(`Sent slack to ${message}`);
+    }
   }
 
   private static trimBracketContents = (text: string): string => text.replace(/\(.+\)/, '');
@@ -43,9 +64,6 @@ class Notifier {
   private static decorate = async (text: string): Promise<string> =>
     `${Notifier.appendJiraLink(text, await getJiraBrowserUrl())}`;
 
-  private static async notifyToSlack(message: string) {
-    await slack.send(await getSlackIncomingWebhookUrl(), message);
-  }
   private static appendJiraLink(text: string, jiraBrowserUrl: string): string {
     return jiraBrowserUrl ? text.replace(/^([^-]+-[0-9]+) /, `<${jiraBrowserUrl}/$1|$1> `) : text;
   }
@@ -109,19 +127,22 @@ class TimerContents {
     this.timerDiv.appendChild(this.deleteButton);
   }
 
-  updateVisibility() {
-    if (isCounting()) {
-      this.startButton.setAttribute('style', 'display: none;');
-      this.pauseButton.setAttribute('style', 'display: visible;');
-      this.interruptButton.setAttribute('style', 'display: visible;');
-      this.doneButton.setAttribute('style', 'display: visible;');
-      this.deleteButton.setAttribute('style', 'display: visible;');
-    } else {
-      this.startButton.setAttribute('style', 'display: visible;');
-      this.pauseButton.setAttribute('style', 'display: none;');
-      this.interruptButton.setAttribute('style', 'display: none;');
-      this.doneButton.setAttribute('style', 'display: none;');
-      this.deleteButton.setAttribute('style', 'display: none;');
+  updateVisibility(status: Status) {
+    switch (status) {
+      case Status.START:
+        this.startButton.setAttribute('style', 'display: none;');
+        this.pauseButton.setAttribute('style', 'display: visible;');
+        this.interruptButton.setAttribute('style', 'display: visible;');
+        this.doneButton.setAttribute('style', 'display: visible;');
+        this.deleteButton.setAttribute('style', 'display: visible;');
+        break;
+      case Status.STOP:
+        this.startButton.setAttribute('style', 'display: visible;');
+        this.pauseButton.setAttribute('style', 'display: none;');
+        this.interruptButton.setAttribute('style', 'display: none;');
+        this.doneButton.setAttribute('style', 'display: none;');
+        this.deleteButton.setAttribute('style', 'display: none;');
+        break;
     }
   }
 
@@ -181,9 +202,19 @@ class TimerContents {
     return this;
   }
 
-  setUpdateStatusListener(callback: (self: this) => void): this {
-    this.timerButtonObserver = new MutationObserver(() => callback(this));
-    this.timerButtonObserver.observe(findTimerButtonElement(), { attributes: true });
+  setUpdateStatusListener(callback: (self: this, nextStatus: Status) => void): this {
+    this.timerButtonObserver = new MutationObserver(e => {
+      switch (e[e.length - 1].oldValue) {
+        case 'Start time entry':
+          callback(this, Status.START);
+          break;
+        case 'Stop time entry':
+          callback(this, Status.STOP);
+          break;
+      }
+    });
+    this.timerButtonObserver.observe(findTimerButtonElement(), { attributes: true, attributeOldValue: true });
+    callback(this, isCounting() ? Status.START : Status.STOP);
     return this;
   }
 
@@ -214,6 +245,8 @@ class TimerContents {
 
 const log = (message: string) => console.log(`${new Date()}: ${message}`);
 
+const notifier = new Notifier();
+
 /**
  * 初期化処理
  * @param e
@@ -232,18 +265,18 @@ function init(e) {
     })
     .setOnClickPauseButtonListener(async s => {
       log('Pause button clicked.');
-      await Notifier.notify(
+      notifier.notify(
         (title, client, project, time) => `:zzz_kirby: \`中断\` ${time}  ${title}    ${client}${project}`,
       );
       s.togglTimerButton.click();
     })
     .setOnClickInterruptButtonListener(async s => {
       log('Interrupt button clicked.');
-      await Notifier.notify((title, client, project, time) => `:denwaneko: \`割込発生\`:fukidashi3::doushite:`);
+      notifier.notify((title, client, project, time) => `:denwaneko: \`割込発生\`:fukidashi3::doushite:`);
 
       s.togglTimerButton.click();
 
-      await Notifier.notify(
+      notifier.notify(
         (title, client, project, time) => `　:genbaneko: \`強制中断\` ${time}  ${title}    ${client}${project}`,
       );
 
@@ -251,31 +284,27 @@ function init(e) {
     })
     .setOnClickDoneButtonListener(async s => {
       log('Done button clicked.');
-      await Notifier.notify(
-        (title, client, project, time) => `:renne: \`完了\` ${time}  ${title}    ${client}${project}`,
-      );
+      notifier.notify((title, client, project, time) => `:renne: \`完了\` ${time}  ${title}    ${client}${project}`);
       s.togglTimerButton.click();
     })
     .setOnClickDeleteButtonListener(async s => {
       log('Delete button clicked.');
-      await Notifier.notify(
+      notifier.notify(
         (title, client, project, time) => `:unitychan_ng: \`やっぱナシ\` ${time}  ${title}    ${client}${project}`,
       );
       s.deleteEntry();
     })
-    .setUpdateStatusListener(async s => {
-      log('Status updated.');
-      s.updateVisibility();
-      if (isCounting() && !s.isTitleEmpty() && findCurrentEntrySeconds() < 10) {
-        await Notifier.notify((title, client, project, time) => `:tio2: \`開始\`  ${title}    ${client}${project}`);
+    .setUpdateStatusListener(async (s, status: Status) => {
+      log(`Status updated -> ${status}.`);
+      s.updateVisibility(status);
+      if (status == Status.START && !s.isTitleEmpty() && findCurrentEntrySeconds() < 10) {
+        notifier.notify((title, client, project, time) => `:tio2: \`開始\`  ${title}    ${client}${project}`);
       }
     });
   // .setUpdateTitleListener(async s => {
   // TODO:
   // s.updateEnablity();
   // });
-
-  contents.updateVisibility();
 }
 
 const initObserver = new MutationObserver(init);
