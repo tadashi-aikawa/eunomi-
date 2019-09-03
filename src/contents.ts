@@ -289,9 +289,7 @@ function init(e) {
     })
     .setOnClickDeleteButtonListener(async s => {
       log('Delete button clicked.');
-      notifier.notify(
-        (title, client, project, time) => `:unitychan_ng: \`やっぱナシ\` ${time}  ${title}    ${client}${project}`,
-      );
+      notifier.notify((title, client, project, time) => `:unitychan_ng: \`やっぱナシ\``);
       s.deleteEntry();
     })
     .setUpdateStatusListener(async (s, status: Status) => {
