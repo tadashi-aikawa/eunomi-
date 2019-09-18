@@ -16,6 +16,7 @@ import {
 } from './clients/togglUi';
 import { div } from './utils/dom';
 import { getJiraBrowserUrl, getSlackIncomingWebhookUrl } from './utils/storage';
+import {toJapanese} from "./utils/time";
 
 enum Status {
   START = 'start',
@@ -59,7 +60,7 @@ class Notifier {
     const project = findEntryProject();
     return project ? `\`📂${Notifier.trimBracketContents(project)}\`` : '';
   };
-  private static time = (): string => `\`⏱${findCurrentEntryTime()}\``;
+  private static time = (): string => `\`⏱${toJapanese(findCurrentEntryTime())}\``;
 
   private static decorate = async (text: string): Promise<string> =>
     `${Notifier.appendJiraLink(text, await getJiraBrowserUrl())}`;
