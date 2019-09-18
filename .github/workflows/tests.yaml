@@ -1,22 +1,22 @@
-name: "Tests"
+name: 'Tests'
 
 on:
   push:
     paths:
-      - ".github/**/*"
-      - "src/*"
-      - "src/**/*"
-      - "*.js"
-      - "*.json"
+      - '.github/**/*'
+      - 'src/*'
+      - 'src/**/*'
+      - '*.js'
+      - '*.json'
   schedule:
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: ["10.x", "12.x"]
+        version: ['10.x', '12.x']
     name: Node ${{ matrix.version }}
 
     steps:
@@ -25,20 +25,17 @@ jobs:
         with:
           node-version: ${{ matrix.version }}
 
-      - name: Install dependencies
-        run: npm install
-      - name: Build test
-        run: npm run build
-      - name: Unit test
-        run: npm test
+      - run: npm install
+      - run: npm run build
+      - run: npm test
 
-      - name: "Slack notification (not success)"
+      - name: 'Slack notification (not success)'
         uses: homoluctus/slatify@master
-        if: "! success()"
+        if: '! success()'
         with:
           type: ${{ job.status }}
-          job_name: ":togowl::nodejs:*${{ matrix.version }}* Tests failure @channel"
-          icon_emoji: "tio2"
+          job_name: ':togowl::nodejs:*${{ matrix.version }}* Tests failure @channel'
+          icon_emoji: 'tio2'
           url: ${{ secrets.SLACK_WEBHOOK }}
 
   notify:
@@ -46,11 +43,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Slack Notification (success)"
+      - name: 'Slack Notification (success)'
         uses: homoluctus/slatify@master
         if: always()
         with:
           type: ${{ job.status }}
-          job_name: ":togowl::nodejs: All tests success :+1:"
-          icon_emoji: ":renne:"
+          job_name: ':togowl::nodejs: All tests success :+1:'
+          icon_emoji: ':renne:'
           url: ${{ secrets.SLACK_WEBHOOK }}
