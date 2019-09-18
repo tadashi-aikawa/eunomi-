@@ -37,7 +37,7 @@ jobs:
         if: "! success()"
         with:
           type: ${{ job.status }}
-          job_name: ":nodejs:*${{ matrix.version }}* Tests failure @channel"
+          job_name: ":togowl::nodejs:*${{ matrix.version }}* Tests failure @channel"
           icon_emoji: "tio2"
           url: ${{ secrets.SLACK_WEBHOOK }}
 
@@ -51,6 +51,6 @@ jobs:
         if: always()
         with:
           type: ${{ job.status }}
-          job_name: ":nodejs: All tests success :+1:"
+          job_name: ":togowl::nodejs: All tests success :+1:"
           icon_emoji: ":renne:"
           url: ${{ secrets.SLACK_WEBHOOK }}
