@@ -37,6 +37,7 @@ jobs:
           username: GitHub Actions (Failure)
           job_name: ':togowl: :nodejs:*${{ matrix.node }}* Tests'
           mention: channel
+          mention_if: always
           icon_emoji: 'tio2'
           url: ${{ secrets.SLACK_WEBHOOK }}
 
