@@ -17,13 +17,13 @@ jobs:
     strategy:
       matrix:
         version: ['10.x', '12.x']
-    name: Node ${{ matrix.version }}
+    name: Node ${{ matrix.node }}
 
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.version }}
+          node-version: ${{ matrix.node }}
 
       - run: npm install
       - run: npm run build
@@ -34,7 +34,8 @@ jobs:
         if: '! success()'
         with:
           type: ${{ job.status }}
-          job_name: ':togowl::nodejs:*${{ matrix.version }}* Tests failure @channel'
+          username: GitHub Actions (Failure)
+          job_name: '<!channel> :togowl: :nodejs:*${{ matrix.node }}* Tests'
           icon_emoji: 'tio2'
           url: ${{ secrets.SLACK_WEBHOOK }}
 
@@ -48,6 +49,7 @@ jobs:
         if: always()
         with:
           type: ${{ job.status }}
-          job_name: ':togowl::nodejs: All tests success :+1:'
+          username: GitHub Actions (Success)
+          job_name: ':togowl: :nodejs: All tests'
           icon_emoji: ':renne:'
           url: ${{ secrets.SLACK_WEBHOOK }}
