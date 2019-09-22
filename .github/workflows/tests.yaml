@@ -35,7 +35,8 @@ jobs:
         with:
           type: ${{ job.status }}
           username: GitHub Actions (Failure)
-          job_name: '<!channel> :togowl: :nodejs:*${{ matrix.node }}* Tests'
+          job_name: ':togowl: :nodejs:*${{ matrix.node }}* Tests'
+          mention: channel
           icon_emoji: 'tio2'
           url: ${{ secrets.SLACK_WEBHOOK }}
 

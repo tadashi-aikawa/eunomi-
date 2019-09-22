@@ -2,7 +2,7 @@ import { toJapanese, toSeconds } from './time';
 
 describe.each`
   timeStr       | expected
-  ${'00:00:01'} | ${1}
+  ${'00:00:01'} | ${10}
   ${'00:00:59'} | ${59}
   ${'00:01:00'} | ${60}
   ${'00:01:01'} | ${61}
