@@ -32,8 +32,14 @@ async function sendReport(date: dayjs.Dayjs) {
 }
 
 function main() {
-  find('send-daily-report-button').addEventListener('click', async () => sendReport(dayjs()));
-  find('send-yesterday-report-button').addEventListener('click', async () => sendReport(dayjs().add(-1, 'day')));
+  find('send-daily-report-button').addEventListener('click', async () => {
+    await sendReport(dayjs());
+    window.close();
+  });
+  find('send-yesterday-report-button').addEventListener('click', async () => {
+    sendReport(dayjs().add(-1, 'day'));
+    window.close();
+  });
 }
 
 window.onload = main;
