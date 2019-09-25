@@ -27,8 +27,7 @@ async function sendReport(date: dayjs.Dayjs) {
     await fetchDailyReport(await getTogglApiToken(), await getTogglWorkspaceId(), date.format('YYYY-MM-DD')),
     `${date.format('YYYY年MM月DD日 dddd')} のレポート`,
   );
-
-  slack.send(await getSlackIncomingWebhookUrl(), message);
+  await slack.send(await getSlackIncomingWebhookUrl(), message);
 }
 
 function main() {
@@ -37,7 +36,7 @@ function main() {
     window.close();
   });
   find('send-yesterday-report-button').addEventListener('click', async () => {
-    sendReport(dayjs().add(-1, 'day'));
+    await sendReport(dayjs().add(-1, 'day'));
     window.close();
   });
 }
