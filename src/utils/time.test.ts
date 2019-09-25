@@ -1,4 +1,4 @@
-import { toJapanese, toSeconds } from './time';
+import { toJapanese, toSeconds, toJapaneseFromSecond } from './time';
 
 describe.each`
   timeStr       | expected
@@ -24,4 +24,17 @@ describe.each`
   ${'01:01:01'} | ${'1時間1分'}
 `('toJapanese', ({ timeStr, expected }) => {
   test(`${timeStr} -> ${expected}`, () => expect(toJapanese(timeStr)).toBe(expected));
+});
+
+describe.each`
+  seconds | expected
+  ${1}    | ${'1秒'}
+  ${59}   | ${'59秒'}
+  ${60}   | ${'1分'}
+  ${61}   | ${'1分'}
+  ${3599} | ${'59分'}
+  ${3600} | ${'1時間'}
+  ${3661} | ${'1時間1分'}
+`('toJapaneseFromSecond', ({ seconds, expected }) => {
+  test(`${seconds} -> ${expected}`, () => expect(toJapaneseFromSecond(seconds)).toBe(expected));
 });

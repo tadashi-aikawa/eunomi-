@@ -16,7 +16,8 @@ import {
 } from './clients/togglUi';
 import { div } from './utils/dom';
 import { getJiraBrowserUrl, getSlackIncomingWebhookUrl } from './utils/storage';
-import {toJapanese} from "./utils/time";
+import { toJapanese } from './utils/time';
+import { trimBracketContents } from './utils/string';
 
 enum Status {
   START = 'start',
@@ -47,18 +48,16 @@ class Notifier {
     }
   }
 
-  private static trimBracketContents = (text: string): string => text.replace(/\(.+\)/, '');
-
   private static title = (): string => {
     return findEntryTitle();
   };
   private static client = (): string => {
     const client = findEntryClient();
-    return client ? `\`👥${Notifier.trimBracketContents(client)}\` > ` : '';
+    return client ? `\`👥${trimBracketContents(client)}\` > ` : '';
   };
   private static project = (): string => {
     const project = findEntryProject();
-    return project ? `\`📂${Notifier.trimBracketContents(project)}\`` : '';
+    return project ? `\`📂${trimBracketContents(project)}\`` : '';
   };
   private static time = (): string => `\`⏱${toJapanese(findCurrentEntryTime())}\``;
 

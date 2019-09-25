@@ -1,0 +1,12 @@
+@base = https://toggl.com/reports/api/v2
+@token = {{$processEnv %togglApiToken}}
+
+### Summary
+
+{{ base }}/summary
+  ?
+  &workspace_id=000000
+  &since=2019-09-24
+  &until=2019-09-24
+  &user_agent={{ token }}
+Authorization: Basic {{ token }} api_token
