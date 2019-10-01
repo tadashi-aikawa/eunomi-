@@ -1,15 +1,24 @@
+import yaml from 'js-yaml';
+
 interface Options {
   slackIncomingWebhookUrl: string;
   jiraBrowserUrl: string;
   togglApiToken: string;
   togglWorkspaceId: string;
+  prefixMapping: string;
 }
 const DEFAULT_OPTIONS: Options = {
   slackIncomingWebhookUrl: '',
   jiraBrowserUrl: '',
   togglApiToken: '',
   togglWorkspaceId: '',
+  prefixMapping: '',
 };
+
+export interface PrefixMapping {
+  client: { [clentId: string]: string };
+  project: { [projectId: string]: string };
+}
 
 function setExtensionStorage<T>(key: keyof Options, value: T): Promise<boolean> {
   return new Promise((resolve, reject) => {
@@ -40,3 +49,8 @@ export const setTogglApiToken = (value: string): Promise<boolean> => setExtensio
 export const getTogglWorkspaceId = (): Promise<number> => getExtensionStorage('togglWorkspaceId').then(Number);
 export const setTogglWorkspaceId = (value: number): Promise<boolean> =>
   setExtensionStorage('togglWorkspaceId', String(value));
+
+export const getPrefixMapping = (): Promise<string> => getExtensionStorage('prefixMapping');
+export const setPrefixMapping = (value: string): Promise<boolean> => setExtensionStorage('prefixMapping', value);
+export const parsePrefixMapping = (): Promise<PrefixMapping> =>
+  getExtensionStorage('prefixMapping').then(yaml.safeLoad);

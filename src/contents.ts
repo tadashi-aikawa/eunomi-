@@ -18,6 +18,7 @@ import { div } from './utils/dom';
 import { getJiraBrowserUrl, getSlackIncomingWebhookUrl } from './utils/storage';
 import { toJapanese } from './utils/time';
 import { trimBracketContents } from './utils/string';
+import { getClientPrefix, getProjectPrefix } from './utils/prefix';
 
 enum Status {
   START = 'start',
@@ -53,11 +54,11 @@ class Notifier {
   };
   private static client = (): string => {
     const client = findEntryClient();
-    return client ? `\`👥${trimBracketContents(client)}\` > ` : '';
+    return client ? `${getClientPrefix(client, '👥')}\`${trimBracketContents(client)}\` > ` : '';
   };
   private static project = (): string => {
     const project = findEntryProject();
-    return project ? `\`📂${trimBracketContents(project)}\`` : '';
+    return project ? `${getProjectPrefix(project, '📂')}\`${trimBracketContents(project)}\`` : '';
   };
   private static time = (): string => `\`⏱${toJapanese(findCurrentEntryTime())}\``;
 
@@ -266,7 +267,7 @@ function init(e) {
     .setOnClickPauseButtonListener(async s => {
       log('Pause button clicked.');
       notifier.notify(
-        (title, client, project, time) => `:zzz_kirby: \`中断\` ${time}  ${title}    ${client}${project}`,
+        (title, client, project, time) => `:zzz_kirby: \`中断\` ${time}  *${title}*    ${client}${project}`,
       );
       s.togglTimerButton.click();
     })
@@ -277,14 +278,14 @@ function init(e) {
       s.togglTimerButton.click();
 
       notifier.notify(
-        (title, client, project, time) => `　:genbaneko: \`強制中断\` ${time}  ${title}    ${client}${project}`,
+        (title, client, project, time) => `　:genbaneko: \`強制中断\` ${time}  *${title}*    ${client}${project}`,
       );
 
       setTimeout(() => s.togglTimerButton.click(), 1000);
     })
     .setOnClickDoneButtonListener(async s => {
       log('Done button clicked.');
-      notifier.notify((title, client, project, time) => `:renne: \`完了\` ${time}  ${title}    ${client}${project}`);
+      notifier.notify((title, client, project, time) => `:renne: \`完了\` ${time}  *${title}*    ${client}${project}`);
       s.togglTimerButton.click();
     })
     .setOnClickDeleteButtonListener(async s => {
@@ -296,7 +297,7 @@ function init(e) {
       log(`Status updated -> ${status}.`);
       s.updateVisibility(status);
       if (status == Status.START && !s.isTitleEmpty() && findCurrentEntrySeconds() < 10) {
-        notifier.notify((title, client, project, time) => `:tio2: \`開始\`  ${title}    ${client}${project}`);
+        notifier.notify((title, client, project, time) => `:tio2: \`開始\`  *${title}*    ${client}${project}`);
       }
     });
   // .setUpdateTitleListener(async s => {

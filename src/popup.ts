@@ -6,6 +6,7 @@ import { fetchDailyReport, ClientReport } from './clients/toggl';
 import { find } from './utils/dom';
 import { getSlackIncomingWebhookUrl, getTogglApiToken, getTogglWorkspaceId } from './utils/storage';
 import { trimBracketContents } from './utils/string';
+import { getClientPrefix, getProjectPrefix } from './utils/prefix';
 
 dayjs.locale('ja');
 
@@ -15,8 +16,15 @@ const toMessage = (reports: ClientReport[], title: string): string =>
 
 ${_(reports)
   .map(r =>
-    `　👥 \`${trimBracketContents(r.client)}\` \`⏱${r.timeAsJapanese}\`
-${r.projects.map(x => `　　　\`📂${trimBracketContents(x.projectName)}\` \`⏱${x.timeAsJapanese}\``).join('\n')}
+    `　${getClientPrefix(r.client, '👥')}\`${trimBracketContents(r.client)}\` \`⏱${r.timeAsJapanese}\`
+${r.projects
+  .map(
+    x =>
+      `　　　${getProjectPrefix(x.projectName, '📂')}\`${trimBracketContents(x.projectName)}\` \`⏱${
+        x.timeAsJapanese
+      }\``,
+  )
+  .join('\n')}
     `.trimRight(),
   )
   .join('\n')}
