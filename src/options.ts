@@ -10,11 +10,14 @@ import {
   getTogglWorkspaceId,
   setPrefixMapping,
   getPrefixMapping,
+  setTodoistApiToken,
+  getTodoistApiToken,
 } from './utils/storage';
 
 const saveButton = find('save');
 
 const slackIncomingWebhookInput = find<HTMLInputElement>('slack-incoming-webhook-url');
+const todoistApiTokenInput = find<HTMLInputElement>('todoist-api-token');
 const togglApiTokenInput = find<HTMLInputElement>('toggl-api-token');
 const togglWorkspaceIdInput = find<HTMLInputElement>('toggl-workspace-id');
 const jiraBrowserUrlInput = find<HTMLInputElement>('jira-browser-url');
@@ -22,6 +25,7 @@ const prefixMappingArea = find<HTMLTextAreaElement>('prefix-mapping');
 
 async function saveOptions() {
   await setSlackIncomingWebhookUrl(slackIncomingWebhookInput.value);
+  await setTodoistApiToken(todoistApiTokenInput.value);
   await setTogglApiToken(togglApiTokenInput.value);
   await setTogglWorkspaceId(Number(togglWorkspaceIdInput.value));
   await setJiraBrowserUrl(jiraBrowserUrlInput.value);
@@ -30,6 +34,7 @@ async function saveOptions() {
 
 async function restoreOptions() {
   slackIncomingWebhookInput.value = await getSlackIncomingWebhookUrl();
+  todoistApiTokenInput.value = await getTodoistApiToken();
   togglApiTokenInput.value = await getTogglApiToken();
   togglWorkspaceIdInput.value = String(await getTogglWorkspaceId());
   jiraBrowserUrlInput.value = await getJiraBrowserUrl();

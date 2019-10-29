@@ -15,10 +15,13 @@ import {
   isCounting,
 } from './clients/togglUi';
 import { div } from './utils/dom';
-import { getJiraBrowserUrl, getSlackIncomingWebhookUrl } from './utils/storage';
+import { getJiraBrowserUrl, getSlackIncomingWebhookUrl, getTodoistApiToken } from './utils/storage';
 import { toJapanese } from './utils/time';
 import { trimBracketContents } from './utils/string';
 import { getClientPrefix, getProjectPrefix } from './utils/prefix';
+import { fetchDailyTasks, Task } from './clients/todoist';
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 enum Status {
   START = 'start',
@@ -89,6 +92,8 @@ class TimerContents {
   doneButton: HTMLDivElement;
   deleteButton: HTMLDivElement;
 
+  todoistButton: HTMLDivElement;
+
   timerButtonObserver: MutationObserver;
   titleInputObserver: MutationObserver;
 
@@ -113,6 +118,8 @@ class TimerContents {
     ins.doneButton = this.createDoneButton();
     ins.deleteButton = this.createDeleteButton();
 
+    ins.todoistButton = this.createTodoistButton();
+
     ins.initLayout();
 
     ins.togglTimerButton.setAttribute('style', 'display: none;');
@@ -126,12 +133,15 @@ class TimerContents {
     this.timerDiv.appendChild(this.interruptButton);
     this.timerDiv.appendChild(this.doneButton);
     this.timerDiv.appendChild(this.deleteButton);
+
+    this.timerDiv.appendChild(this.todoistButton);
   }
 
   updateVisibility(status: Status) {
     switch (status) {
       case Status.START:
         this.startButton.setAttribute('style', 'display: none;');
+        this.todoistButton.setAttribute('style', 'display: none;');
         this.pauseButton.setAttribute('style', 'display: visible;');
         this.interruptButton.setAttribute('style', 'display: visible;');
         this.doneButton.setAttribute('style', 'display: visible;');
@@ -139,6 +149,7 @@ class TimerContents {
         break;
       case Status.STOP:
         this.startButton.setAttribute('style', 'display: visible;');
+        this.todoistButton.setAttribute('style', 'display: visible;');
         this.pauseButton.setAttribute('style', 'display: none;');
         this.interruptButton.setAttribute('style', 'display: none;');
         this.doneButton.setAttribute('style', 'display: none;');
@@ -226,7 +237,7 @@ class TimerContents {
   }
 
   private static createStartButton(): HTMLDivElement {
-    return div(`<i class="fas fa-play-circle fa-3x ebutton ebutton-start"></i>`, 'togowl-button-div');
+    return div(`<i class="fas fa-play-circle fa-3x ebutton ebutton-start"></i>`, 'togowl-button-div', 'start-button');
   }
 
   private static createPauseButton(): HTMLDivElement {
@@ -241,6 +252,45 @@ class TimerContents {
   }
   private static createDeleteButton(): HTMLDivElement {
     return div(`<i class="fas fa-trash fa-2x ebutton ebutton-delete"></i>`, 'togowl-button-div');
+  }
+
+  private static createTodoistButton(): HTMLDivElement {
+    const elem = div(
+      `<img class="ebutton" src="https://cdn.svgporn.com/logos/todoist-icon.svg" />`,
+      'togowl-button-div',
+      'todoist-button',
+    );
+
+    const initContent = `<div style="width: 400px;">Loading next tasks from Todoist...</div>`;
+    tippy(elem, {
+      theme: 'light',
+      trigger: 'click',
+      maxWidth: 400,
+      flipOnUpdate: true,
+      interactive: true,
+      content: initContent,
+      onShow: instance => {
+        getTodoistApiToken().then(token => {
+          chrome.runtime.sendMessage({ type: 'todoist.fetchDailyTasks', token: token }, (tasks: Task[]) => {
+            instance.setContent(`<div style="width: 400px;">
+  <ul>
+    ${tasks
+      .map(
+        x =>
+          `<li class="todoist-item">${x.title} <span style="color: darkgrey; font-size: 80%;">${x.projectName}</span></li>`,
+      )
+      .join('')}
+  </ul>
+</div>`);
+          });
+        });
+      },
+      onHidden(instance) {
+        instance.setContent(initContent);
+      },
+    });
+
+    return elem;
   }
 }
 

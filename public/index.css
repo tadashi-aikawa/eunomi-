@@ -34,3 +34,14 @@
 .ebutton-delete {
   color: goldenrod;
 }
+
+.todoist-item {
+  margin: 10px;
+  cursor: pointer;
+}
+
+.todoist-item:hover {
+  color: orangered;
+  font-size: 105%;
+  font-weight: bolder;
+}

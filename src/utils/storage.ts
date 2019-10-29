@@ -3,6 +3,7 @@ import yaml from 'js-yaml';
 interface Options {
   slackIncomingWebhookUrl: string;
   jiraBrowserUrl: string;
+  todoistApiToken: string;
   togglApiToken: string;
   togglWorkspaceId: string;
   prefixMapping: string;
@@ -10,6 +11,7 @@ interface Options {
 const DEFAULT_OPTIONS: Options = {
   slackIncomingWebhookUrl: '',
   jiraBrowserUrl: '',
+  todoistApiToken: '',
   togglApiToken: '',
   togglWorkspaceId: '',
   prefixMapping: '',
@@ -42,6 +44,9 @@ export const setSlackIncomingWebhookUrl = (value: string): Promise<boolean> =>
 
 export const getJiraBrowserUrl = (): Promise<string> => getExtensionStorage('jiraBrowserUrl');
 export const setJiraBrowserUrl = (value: string): Promise<boolean> => setExtensionStorage('jiraBrowserUrl', value);
+
+export const getTodoistApiToken = (): Promise<string> => getExtensionStorage('todoistApiToken');
+export const setTodoistApiToken = (value: string): Promise<boolean> => setExtensionStorage('todoistApiToken', value);
 
 export const getTogglApiToken = (): Promise<string> => getExtensionStorage('togglApiToken');
 export const setTogglApiToken = (value: string): Promise<boolean> => setExtensionStorage('togglApiToken', value);

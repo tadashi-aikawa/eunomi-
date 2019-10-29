@@ -29,5 +29,5 @@
     "scripts": ["js/vendor.js", "js/background.js"]
   },
 
-  "permissions": ["storage", "https://hooks.slack.com/*"]
+  "permissions": ["storage", "https://hooks.slack.com/*", "https://api.todoist.com/*"]
 }
