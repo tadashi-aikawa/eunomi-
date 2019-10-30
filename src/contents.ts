@@ -25,7 +25,7 @@ import {
 import { toJapanese } from './utils/time';
 import { trimBracketContents } from './utils/string';
 import { getClientPrefix, getProjectPrefix } from './utils/prefix';
-import { fetchDailyTasks, Task } from './clients/todoist';
+import { Task } from './clients/todoist';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { findProjectId, startTimer } from './clients/toggl';
@@ -293,7 +293,10 @@ class TimerContents {
           chrome.runtime.sendMessage({ type: 'todoist.fetchDailyTasks', token: token }, (tasks: Task[]) => {
             const div = document.createElement('div');
             const ul = document.createElement('ul');
-            tasks.map(task2Li).forEach(e => ul.appendChild(e));
+            tasks
+              .slice(0, 5)
+              .map(task2Li)
+              .forEach(e => ul.appendChild(e));
             div.appendChild(ul);
             instance.setContent(div);
           });
