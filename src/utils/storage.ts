@@ -1,20 +1,26 @@
 import yaml from 'js-yaml';
 
-interface Options {
+interface Storage {
   slackIncomingWebhookUrl: string;
   jiraBrowserUrl: string;
   todoistApiToken: string;
   togglApiToken: string;
   togglWorkspaceId: string;
   prefixMapping: string;
+
+  currentTodoistTaskId: string;
+  currentTodoistTaskName: string;
 }
-const DEFAULT_OPTIONS: Options = {
+const DEFAULT_STORAGE: Storage = {
   slackIncomingWebhookUrl: '',
   jiraBrowserUrl: '',
   todoistApiToken: '',
   togglApiToken: '',
   togglWorkspaceId: '',
   prefixMapping: '',
+
+  currentTodoistTaskId: '-1',
+  currentTodoistTaskName: '',
 };
 
 export interface PrefixMapping {
@@ -22,7 +28,7 @@ export interface PrefixMapping {
   project: { [projectId: string]: string };
 }
 
-function setExtensionStorage<T>(key: keyof Options, value: T): Promise<boolean> {
+function setExtensionStorage<T>(key: keyof Storage, value: T): Promise<boolean> {
   return new Promise((resolve, reject) => {
     chrome.storage.sync.set({ [key]: value }, () => {
       resolve(true);
@@ -30,10 +36,10 @@ function setExtensionStorage<T>(key: keyof Options, value: T): Promise<boolean> 
   });
 }
 
-function getExtensionStorage(key: keyof Options): Promise<Options[keyof Options]> {
+function getExtensionStorage(key: keyof Storage): Promise<Storage[keyof Storage]> {
   return new Promise((resolve, reject) => {
-    chrome.storage.sync.get(DEFAULT_OPTIONS, (options: Options) => {
-      resolve(options[key]);
+    chrome.storage.sync.get(DEFAULT_STORAGE, (storage: Storage) => {
+      resolve(storage[key]);
     });
   });
 }
@@ -54,6 +60,14 @@ export const setTogglApiToken = (value: string): Promise<boolean> => setExtensio
 export const getTogglWorkspaceId = (): Promise<number> => getExtensionStorage('togglWorkspaceId').then(Number);
 export const setTogglWorkspaceId = (value: number): Promise<boolean> =>
   setExtensionStorage('togglWorkspaceId', String(value));
+
+export const getCurrentTodoistTaskId = (): Promise<number> => getExtensionStorage('currentTodoistTaskId').then(Number);
+export const setCurrentTodoistTaskId = (value: number): Promise<boolean> =>
+  setExtensionStorage('currentTodoistTaskId', String(value));
+
+export const getCurrentTodoistTaskName = (): Promise<string> => getExtensionStorage('currentTodoistTaskName');
+export const setCurrentTodoistTaskName = (value: string): Promise<boolean> =>
+  setExtensionStorage('currentTodoistTaskName', value);
 
 export const getPrefixMapping = (): Promise<string> => getExtensionStorage('prefixMapping');
 export const setPrefixMapping = (value: string): Promise<boolean> => setExtensionStorage('prefixMapping', value);

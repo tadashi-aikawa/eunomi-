@@ -51,6 +51,26 @@ namespace Api {
   }
 }
 
+const REST_BASE = 'https://api.todoist.com/rest/v1';
+
+namespace RestApi {
+  export class Client {
+    token: string;
+
+    constructor(token: string) {
+      this.token = token;
+    }
+
+    closeTask(taskId: number): AxiosPromise<void> {
+      return Axios.post(`${REST_BASE}/tasks/${taskId}/close`, undefined, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+    }
+  }
+}
+
 export class Task {
   constructor(public id: number, public title: string, public projectName: string | null) {}
 }
@@ -73,4 +93,9 @@ export async function fetchDailyTasks(token: string): Promise<Task[]> {
     .orderBy(x => x.day_order)
     .map(x => toTask(x, projectNameById))
     .value();
+}
+
+export async function closeTask(token: string, taskId: number): Promise<void> {
+  const client = new RestApi.Client(token);
+  return client.closeTask(taskId).then();
 }

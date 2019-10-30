@@ -16,16 +16,20 @@ import {
 } from './clients/togglUi';
 import { div } from './utils/dom';
 import {
+  getCurrentTodoistTaskId,
+  getCurrentTodoistTaskName,
   getJiraBrowserUrl,
   getSlackIncomingWebhookUrl,
   getTodoistApiToken,
   getTogglApiToken,
   getTogglWorkspaceId,
+  setCurrentTodoistTaskId,
+  setCurrentTodoistTaskName,
 } from './utils/storage';
 import { toJapanese } from './utils/time';
 import { toEmojiString, trimBracketContents, trimBracketTime } from './utils/string';
 import { getClientPrefix, getProjectPrefix } from './utils/prefix';
-import { Task } from './clients/todoist';
+import { closeTask, Task } from './clients/todoist';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { findProjectId, startTimer } from './clients/toggl';
@@ -302,6 +306,9 @@ class TimerContents {
                     task.projectName,
                   );
                   await startTimer(await getTogglApiToken(), trimBracketTime(task.title), projectId);
+                  await setCurrentTodoistTaskId(task.id);
+                  await setCurrentTodoistTaskName(task.title);
+                  // TODO: プロジェクトでも判定したほうが安全
                   instance.hide();
                 }),
               )
@@ -362,6 +369,14 @@ function init(e) {
     .setOnClickDoneButtonListener(async s => {
       log('Done button clicked.');
       notifier.notify((title, client, project, time) => `:renne: \`完了\` ${time}  *${title}*    ${client}${project}`);
+
+      const todoistTaskName = await getCurrentTodoistTaskName();
+      if (findEntryTitle() === trimBracketTime(todoistTaskName)) {
+        await closeTask(await getTodoistApiToken(), await getCurrentTodoistTaskId());
+      }
+      await setCurrentTodoistTaskId(-1);
+      await setCurrentTodoistTaskName('');
+
       s.togglTimerButton.click();
     })
     .setOnClickDeleteButtonListener(async s => {
