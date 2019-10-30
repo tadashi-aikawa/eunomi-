@@ -23,7 +23,7 @@ import {
   getTogglWorkspaceId,
 } from './utils/storage';
 import { toJapanese } from './utils/time';
-import { trimBracketContents, trimBracketTime } from './utils/string';
+import { toEmojiString, trimBracketContents, trimBracketTime } from './utils/string';
 import { getClientPrefix, getProjectPrefix } from './utils/prefix';
 import { Task } from './clients/todoist';
 import tippy from 'tippy.js';
@@ -273,7 +273,9 @@ class TimerContents {
       const elm = document.createElement('li');
       elm.setAttribute('class', 'todoist-item');
       elm.setAttribute('style', 'width: 400px;');
-      elm.innerHTML = `${task.title} <span style="color: darkgrey; font-size: 80%;">${task.projectName}</span>`;
+      elm.innerHTML = `${toEmojiString(task.title)} <span style="color: darkgrey; font-size: 80%;">${
+        task.projectName
+      }</span>`;
       elm.addEventListener('click', async () => {
         const projectId = await findProjectId(await getTogglApiToken(), await getTogglWorkspaceId(), task.projectName);
         await startTimer(await getTogglApiToken(), trimBracketTime(task.title), projectId);
