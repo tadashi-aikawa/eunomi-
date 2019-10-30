@@ -15,13 +15,20 @@ import {
   isCounting,
 } from './clients/togglUi';
 import { div } from './utils/dom';
-import { getJiraBrowserUrl, getSlackIncomingWebhookUrl, getTodoistApiToken } from './utils/storage';
+import {
+  getJiraBrowserUrl,
+  getSlackIncomingWebhookUrl,
+  getTodoistApiToken,
+  getTogglApiToken,
+  getTogglWorkspaceId,
+} from './utils/storage';
 import { toJapanese } from './utils/time';
 import { trimBracketContents } from './utils/string';
 import { getClientPrefix, getProjectPrefix } from './utils/prefix';
 import { fetchDailyTasks, Task } from './clients/todoist';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
+import { findProjectId, startTimer } from './clients/toggl';
 
 enum Status {
   START = 'start',
@@ -262,6 +269,18 @@ class TimerContents {
     );
 
     const initContent = `<div style="width: 400px;">Loading next tasks from Todoist...</div>`;
+    const task2Li = (task: Task): Element => {
+      const elm = document.createElement('li');
+      elm.setAttribute('class', 'todoist-item');
+      elm.setAttribute('style', 'width: 400px;');
+      elm.innerHTML = `${task.title} <span style="color: darkgrey; font-size: 80%;">${task.projectName}</span>`;
+      elm.addEventListener('click', async () => {
+        const projectId = await findProjectId(await getTogglApiToken(), await getTogglWorkspaceId(), task.projectName);
+        await startTimer(await getTogglApiToken(), task.title, projectId);
+      });
+      return elm;
+    };
+
     tippy(elem, {
       theme: 'light',
       trigger: 'click',
@@ -272,16 +291,11 @@ class TimerContents {
       onShow: instance => {
         getTodoistApiToken().then(token => {
           chrome.runtime.sendMessage({ type: 'todoist.fetchDailyTasks', token: token }, (tasks: Task[]) => {
-            instance.setContent(`<div style="width: 400px;">
-  <ul>
-    ${tasks
-      .map(
-        x =>
-          `<li class="todoist-item">${x.title} <span style="color: darkgrey; font-size: 80%;">${x.projectName}</span></li>`,
-      )
-      .join('')}
-  </ul>
-</div>`);
+            const div = document.createElement('div');
+            const ul = document.createElement('ul');
+            tasks.map(task2Li).forEach(e => ul.appendChild(e));
+            div.appendChild(ul);
+            instance.setContent(div);
           });
         });
       },

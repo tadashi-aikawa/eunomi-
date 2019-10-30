@@ -2,9 +2,50 @@ import Axios, { AxiosPromise } from 'axios';
 import _ from 'lodash';
 import { toJapaneseFromSecond } from '../utils/time';
 
-const REPORT_BASE = 'https://toggl.com/reports/api/v2';
+const BASE = 'https://toggl.com/api/v8';
 
 namespace Api {
+  export interface Project {
+    id: number;
+    name: string;
+  }
+
+  export class Client {
+    token: string;
+    get auth() {
+      return {
+        username: this.token,
+        password: 'api_token',
+      };
+    }
+
+    constructor(token: string) {
+      this.token = token;
+    }
+
+    projects(workspaceId: number): AxiosPromise<Project[]> {
+      return Axios.get(`${BASE}/workspaces/${workspaceId}/projects`, {
+        auth: this.auth,
+      });
+    }
+
+    startTimeEntry(description: string, projectId: number | undefined): AxiosPromise<any> {
+      return Axios.post(
+        `${BASE}/time_entries/start`,
+        {
+          time_entry: { description: description, pid: projectId, created_with: 'togowl' },
+        },
+        {
+          auth: this.auth,
+        },
+      );
+    }
+  }
+}
+
+const REPORT_BASE = 'https://toggl.com/reports/api/v2';
+
+namespace ReportApi {
   export interface Item {
     title: {
       time_entry: string;
@@ -65,7 +106,7 @@ export class ClientReport {
   }
 }
 
-const toClientReport = (summaries: Api.Summary[]): ClientReport =>
+const toClientReport = (summaries: ReportApi.Summary[]): ClientReport =>
   new ClientReport(
     summaries[0].title.client,
     summaries.map(x => new ProjectReport(x.title.project, x.time / 1000)),
@@ -79,7 +120,7 @@ const toClientReport = (summaries: Api.Summary[]): ClientReport =>
  * @param date 日付(yyyy-MM-dd)
  */
 export function fetchDailyReport(token: string, workSpaceId: number, date: string): Promise<ClientReport[]> {
-  const client = new Api.Client(token);
+  const client = new ReportApi.Client(token);
   return client.summary(workSpaceId, date, date).then(x =>
     _(x.data.data)
       .groupBy(s => s.title.client)
@@ -89,4 +130,23 @@ export function fetchDailyReport(token: string, workSpaceId: number, date: strin
       .orderBy(r => r.seconds, 'desc')
       .value(),
   );
+}
+
+/**
+ * 名称が完全一致するプロジェクトIDを検索します
+ * @param token: Togglトークン
+ * @param workSpaceId TogglワークスペースID
+ * @param projectName 検索プロジェクト名
+ */
+export function findProjectId(token: string, workSpaceId: number, projectName: string): Promise<number | undefined> {
+  const client = new Api.Client(token);
+  return client.projects(workSpaceId).then(x => {
+    const project = _.find(x.data, p => p.name === projectName);
+    return project ? project.id : undefined;
+  });
+}
+
+export function startTimer(token: string, title: string, projectId: number | undefined): Promise<void> {
+  const client = new Api.Client(token);
+  return client.startTimeEntry(title, projectId).then();
 }

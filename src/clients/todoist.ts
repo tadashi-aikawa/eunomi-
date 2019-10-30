@@ -70,7 +70,6 @@ export async function fetchDailyTasks(token: string): Promise<Task[]> {
   const today = dayjs().format('YYYY-MM-DD');
   return _(res.items)
     .filter(x => x.due && x.due.date === today)
-    .filter(x => x.parent_id === null)
     .orderBy(x => x.day_order)
     .map(x => toTask(x, projectNameById))
     .value();
