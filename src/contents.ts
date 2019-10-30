@@ -284,7 +284,7 @@ class TimerContents {
     tippy(elem, {
       theme: 'light',
       trigger: 'click',
-      maxWidth: 400,
+      maxWidth: 500,
       flipOnUpdate: true,
       interactive: true,
       content: initContent,
