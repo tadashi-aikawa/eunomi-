@@ -23,7 +23,7 @@ import {
   getTogglWorkspaceId,
 } from './utils/storage';
 import { toJapanese } from './utils/time';
-import { trimBracketContents } from './utils/string';
+import { trimBracketContents, trimBracketTime } from './utils/string';
 import { getClientPrefix, getProjectPrefix } from './utils/prefix';
 import { Task } from './clients/todoist';
 import tippy from 'tippy.js';
@@ -276,7 +276,7 @@ class TimerContents {
       elm.innerHTML = `${task.title} <span style="color: darkgrey; font-size: 80%;">${task.projectName}</span>`;
       elm.addEventListener('click', async () => {
         const projectId = await findProjectId(await getTogglApiToken(), await getTogglWorkspaceId(), task.projectName);
-        await startTimer(await getTogglApiToken(), task.title, projectId);
+        await startTimer(await getTogglApiToken(), trimBracketTime(task.title), projectId);
       });
       return elm;
     };
