@@ -269,17 +269,14 @@ class TimerContents {
     );
 
     const initContent = `<div style="width: 400px;">Loading next tasks from Todoist...</div>`;
-    const task2Li = (task: Task): Element => {
+    const task2Li = (task: Task, onClickListener): Element => {
       const elm = document.createElement('li');
       elm.setAttribute('class', 'todoist-item');
       elm.setAttribute('style', 'width: 400px;');
       elm.innerHTML = `${toEmojiString(task.title)} <span style="color: darkgrey; font-size: 80%;">${
         task.projectName
       }</span>`;
-      elm.addEventListener('click', async () => {
-        const projectId = await findProjectId(await getTogglApiToken(), await getTogglWorkspaceId(), task.projectName);
-        await startTimer(await getTogglApiToken(), trimBracketTime(task.title), projectId);
-      });
+      elm.addEventListener('click', onClickListener);
       return elm;
     };
 
@@ -297,7 +294,17 @@ class TimerContents {
             const ul = document.createElement('ul');
             tasks
               .slice(0, 5)
-              .map(task2Li)
+              .map(task =>
+                task2Li(task, async () => {
+                  const projectId = await findProjectId(
+                    await getTogglApiToken(),
+                    await getTogglWorkspaceId(),
+                    task.projectName,
+                  );
+                  await startTimer(await getTogglApiToken(), trimBracketTime(task.title), projectId);
+                  instance.hide();
+                }),
+              )
               .forEach(e => ul.appendChild(e));
             div.appendChild(ul);
             instance.setContent(div);
