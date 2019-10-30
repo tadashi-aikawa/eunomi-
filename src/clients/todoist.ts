@@ -24,6 +24,7 @@ namespace Api {
     parent_id: number | null;
     project_id: number | null;
     due: Due | null;
+    checked: number;
   }
 
   export interface Root {
@@ -72,11 +73,11 @@ namespace RestApi {
 }
 
 export class Task {
-  constructor(public id: number, public title: string, public projectName: string | null) {}
+  constructor(public id: number, public title: string, public projectName: string | null, public checked: boolean) {}
 }
 
 const toTask = (task: Api.Task, projectNameById: Dictionary<Api.Project>): Task =>
-  new Task(task.id, task.content, task.project_id ? projectNameById[task.project_id].name : null);
+  new Task(task.id, task.content, task.project_id ? projectNameById[task.project_id].name : null, task.checked === 1);
 
 /**
  * 本日のタスク一覧を取得します
@@ -92,6 +93,7 @@ export async function fetchDailyTasks(token: string): Promise<Task[]> {
     .filter(x => x.due && x.due.date === today)
     .orderBy(x => x.day_order)
     .map(x => toTask(x, projectNameById))
+    .reject(x => x.checked)
     .value();
 }
 
