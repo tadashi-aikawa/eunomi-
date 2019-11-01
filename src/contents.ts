@@ -300,7 +300,7 @@ class TimerContents {
             const ul = document.createElement('ul');
             const ignoreTodoistProjectIds = await getTodoistIgnoreProjectIds();
             tasks
-              .filter(task => _.includes(ignoreTodoistProjectIds, String(task.projectId)))
+              .filter(task => !_.includes(ignoreTodoistProjectIds, task.projectId))
               .slice(0, 5)
               .map(task =>
                 task2Li(task, async () => {

@@ -29,7 +29,7 @@ const prefixMappingArea = find<HTMLTextAreaElement>('prefix-mapping');
 async function saveOptions() {
   await setSlackIncomingWebhookUrl(slackIncomingWebhookInput.value);
   await setTodoistApiToken(todoistApiTokenInput.value);
-  await setTodoistIgnoreProjectIds(todoistIgnoreProjectIdsInput.value.split(','));
+  await setTodoistIgnoreProjectIds(todoistIgnoreProjectIdsInput.value.split(',').map(Number));
   await setTogglApiToken(togglApiTokenInput.value);
   await setTogglWorkspaceId(Number(togglWorkspaceIdInput.value));
   await setJiraBrowserUrl(jiraBrowserUrlInput.value);
