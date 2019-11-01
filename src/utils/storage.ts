@@ -4,6 +4,7 @@ interface Storage {
   slackIncomingWebhookUrl: string;
   jiraBrowserUrl: string;
   todoistApiToken: string;
+  todoistIgnoreProjectIds: string;
   togglApiToken: string;
   togglWorkspaceId: string;
   prefixMapping: string;
@@ -15,6 +16,7 @@ const DEFAULT_STORAGE: Storage = {
   slackIncomingWebhookUrl: '',
   jiraBrowserUrl: '',
   todoistApiToken: '',
+  todoistIgnoreProjectIds: '',
   togglApiToken: '',
   togglWorkspaceId: '',
   prefixMapping: '',
@@ -53,6 +55,11 @@ export const setJiraBrowserUrl = (value: string): Promise<boolean> => setExtensi
 
 export const getTodoistApiToken = (): Promise<string> => getExtensionStorage('todoistApiToken');
 export const setTodoistApiToken = (value: string): Promise<boolean> => setExtensionStorage('todoistApiToken', value);
+
+export const getTodoistIgnoreProjectIds = (): Promise<string[]> =>
+  getExtensionStorage('todoistIgnoreProjectIds').then(x => x.split(',').filter(x => x));
+export const setTodoistIgnoreProjectIds = (value: string[]): Promise<boolean> =>
+  setExtensionStorage('todoistIgnoreProjectIds', value.join(','));
 
 export const getTogglApiToken = (): Promise<string> => getExtensionStorage('togglApiToken');
 export const setTogglApiToken = (value: string): Promise<boolean> => setExtensionStorage('togglApiToken', value);

@@ -2,6 +2,7 @@ import '@fortawesome/fontawesome-free/js/fontawesome';
 import '@fortawesome/fontawesome-free/js/regular';
 import '@fortawesome/fontawesome-free/js/solid';
 import * as slack from './clients/slack';
+import _ from 'lodash';
 import {
   findCurrentEntrySeconds,
   findCurrentEntryTime,
@@ -21,6 +22,7 @@ import {
   getJiraBrowserUrl,
   getSlackIncomingWebhookUrl,
   getTodoistApiToken,
+  getTodoistIgnoreProjectIds,
   getTogglApiToken,
   getTogglWorkspaceId,
   setCurrentTodoistTaskId,
@@ -293,10 +295,12 @@ class TimerContents {
       content: initContent,
       onShow: instance => {
         getTodoistApiToken().then(token => {
-          chrome.runtime.sendMessage({ type: 'todoist.fetchDailyTasks', token: token }, (tasks: Task[]) => {
+          chrome.runtime.sendMessage({ type: 'todoist.fetchDailyTasks', token: token }, async (tasks: Task[]) => {
             const div = document.createElement('div');
             const ul = document.createElement('ul');
+            const ignoreTodoistProjectIds = await getTodoistIgnoreProjectIds();
             tasks
+              .filter(task => _.includes(ignoreTodoistProjectIds, String(task.projectId)))
               .slice(0, 5)
               .map(task =>
                 task2Li(task, async () => {

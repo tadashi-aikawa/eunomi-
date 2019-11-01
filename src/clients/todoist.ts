@@ -73,11 +73,23 @@ namespace RestApi {
 }
 
 export class Task {
-  constructor(public id: number, public title: string, public projectName: string | null, public checked: boolean) {}
+  constructor(
+    public id: number,
+    public title: string,
+    public projectId: number | null,
+    public projectName: string | null,
+    public checked: boolean,
+  ) {}
 }
 
 const toTask = (task: Api.Task, projectNameById: Dictionary<Api.Project>): Task =>
-  new Task(task.id, task.content, task.project_id ? projectNameById[task.project_id].name : null, task.checked === 1);
+  new Task(
+    task.id,
+    task.content,
+    task.project_id || null,
+    task.project_id ? projectNameById[task.project_id].name : null,
+    task.checked === 1,
+  );
 
 /**
  * 本日のタスク一覧を取得します
