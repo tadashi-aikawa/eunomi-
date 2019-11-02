@@ -25,14 +25,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Cache node modules2
-        uses: actions/cache@preview
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - run: npm install
       - run: npm run build
       - run: npm test
