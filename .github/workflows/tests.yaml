@@ -29,7 +29,7 @@ jobs:
         uses: actions/cache@preview
         with:
           path: node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
