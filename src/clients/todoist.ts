@@ -39,9 +39,9 @@ namespace Api {
       this.token = token;
     }
 
-    sync(resourceType: string[], syncToken: string = '*'): AxiosPromise<Root> {
+    sync(resourceTypes: string[], syncToken: string = '*'): AxiosPromise<Root> {
       return Axios.get(
-        `${BASE}/sync?sync_token=${syncToken}&resource_types=[${resourceType.map(x => `"${x}"`).join(',')}]`,
+        `${BASE}/sync?sync_token=${syncToken}&resource_types=[${resourceTypes.map(x => `"${x}"`).join(',')}]`,
         {
           headers: {
             Authorization: `Bearer ${this.token}`,
