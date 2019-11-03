@@ -1,4 +1,4 @@
-import { toEmojiString, trimBracketTime } from './string';
+import { toEmojiString, trimBracketTime, trimPrefixEmoji } from './string';
 
 describe.each`
   str                            | expected
@@ -16,6 +16,17 @@ describe.each`
   ${'hoge (huga) (13:35-14:30)'} | ${'hoge (huga)'}
 `('trimBracketTime', ({ str, expected }) => {
   test(`${str} -> ${expected}`, () => expect(trimBracketTime(str)).toBe(expected));
+});
+
+describe.each`
+  str                       | expected
+  ${'hoge'}                 | ${'hoge'}
+  ${':emoji: hoge'}         | ${'hoge'}
+  ${' :emoji: hoge'}        | ${'hoge'}
+  ${':emoji:hoge'}          | ${'hoge'}
+  ${':emoji: hoge :emoji:'} | ${'hoge :emoji:'}
+`('trimPrefixEmoji', ({ str, expected }) => {
+  test(`${str} -> ${expected}`, () => expect(trimPrefixEmoji(str)).toBe(expected));
 });
 
 describe.each`

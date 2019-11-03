@@ -1,6 +1,7 @@
 import Axios, { AxiosPromise } from 'axios';
 import _ from 'lodash';
 import { toJapaneseFromSecond } from '../utils/time';
+import { trimBracketTime, trimPrefixEmoji } from '../utils/string';
 
 const BASE = 'https://toggl.com/api/v8';
 
@@ -90,6 +91,13 @@ namespace ReportApi {
   }
 }
 
+// vo...
+export class TogglTitle extends String {
+  static fromTodoistTitle(todoistTitle: string): TogglTitle {
+    return trimPrefixEmoji(trimBracketTime(todoistTitle));
+  }
+}
+
 class ProjectReport {
   constructor(public projectName: string, public seconds: number) {}
 
@@ -146,7 +154,7 @@ export function findProjectId(token: string, workSpaceId: number, projectName: s
   });
 }
 
-export function startTimer(token: string, title: string, projectId: number | undefined): Promise<void> {
+export function startTimer(token: string, title: TogglTitle, projectId: number | undefined): Promise<void> {
   const client = new Api.Client(token);
-  return client.startTimeEntry(title, projectId).then();
+  return client.startTimeEntry(title.toString(), projectId).then();
 }
