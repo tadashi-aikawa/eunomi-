@@ -1,6 +1,7 @@
 import Axios, { AxiosPromise } from 'axios';
 import _, { Dictionary, NumericDictionary } from 'lodash';
 import dayjs from 'dayjs';
+import { debug } from '../utils/logger';
 
 const BASE = 'https://api.todoist.com/api/v8';
 
@@ -116,15 +117,13 @@ export class TodoistClient {
     const client = new Api.Client(this.token);
     const res: Api.Root = (await client.sync(['items', 'projects'], this.syncToken)).data;
     this.syncToken = res.sync_token;
-    console.debug(`res.full_sync: ${res.full_sync}`);
-    console.debug(`syncToken: ${this.syncToken}`);
+    debug(`res.full_sync: ${res.full_sync}`);
+    debug(`syncToken: ${this.syncToken}`);
 
     const _projectById: NumericDictionary<Api.Project> = _.keyBy(res.projects, x => x.id);
     const _taskById: NumericDictionary<Api.Task> = _.keyBy(res.items, x => x.id);
-    console.debug('_projectById');
-    console.debug(_projectById);
-    console.debug('_taskById');
-    console.debug(_taskById);
+    debug('_projectById', _projectById);
+    debug('_taskById', _taskById);
     if (res.full_sync) {
       this.projectById = _projectById;
       this.taskById = _taskById;

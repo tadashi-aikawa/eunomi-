@@ -36,6 +36,7 @@ import { Task } from './clients/todoist';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { findProjectId, startTimer, TogglTitle } from './clients/toggl';
+import { debug } from './utils/logger';
 
 enum Status {
   START = 'start',
@@ -53,7 +54,7 @@ class Notifier {
       Notifier.time(),
     );
     this.messageQueue.push(message);
-    log(`Pushed ${message} to queue.`);
+    debug(`Pushed ${message} to queue.`);
 
     this.notifyToSlack();
   }
@@ -62,7 +63,7 @@ class Notifier {
     while (this.messageQueue.length > 0) {
       const message = this.messageQueue.shift();
       await slack.send(await getSlackIncomingWebhookUrl(), message);
-      log(`Sent slack to ${message}`);
+      debug(`Sent slack to ${message}`);
     }
   }
 
@@ -322,8 +323,6 @@ class TimerContents {
   }
 }
 
-const log = (message: string) => console.log(`${new Date()}: ${message}`);
-
 const notifier = new Notifier();
 
 /**
@@ -336,21 +335,21 @@ function init(e) {
   }
   initObserver.disconnect();
 
-  log('Add timer contents.');
+  debug('Add timer contents.');
   const contents = TimerContents.create()
     .setOnClickStartButtonListener(s => {
-      log('Start button clicked.');
+      debug('Start button clicked.');
       s.togglTimerButton.click();
     })
     .setOnClickPauseButtonListener(async s => {
-      log('Pause button clicked.');
+      debug('Pause button clicked.');
       notifier.notify(
         (title, client, project, time) => `:zzz_kirby: \`中断\` ${time}  *${title}*    ${client}${project}`,
       );
       s.togglTimerButton.click();
     })
     .setOnClickInterruptButtonListener(async s => {
-      log('Interrupt button clicked.');
+      debug('Interrupt button clicked.');
       notifier.notify((title, client, project, time) => `:denwaneko: \`割込発生\`:fukidashi3::doushite:`);
 
       s.togglTimerButton.click();
@@ -362,7 +361,7 @@ function init(e) {
       setTimeout(() => s.togglTimerButton.click(), 1000);
     })
     .setOnClickDoneButtonListener(async s => {
-      log('Done button clicked.');
+      debug('Done button clicked.');
       notifier.notify((title, client, project, time) => `:renne: \`完了\` ${time}  *${title}*    ${client}${project}`);
 
       const todoistTaskName = await getCurrentTodoistTaskName();
@@ -377,12 +376,12 @@ function init(e) {
       s.togglTimerButton.click();
     })
     .setOnClickDeleteButtonListener(async s => {
-      log('Delete button clicked.');
+      debug('Delete button clicked.');
       notifier.notify((title, client, project, time) => `:unitychan_ng: \`やっぱナシ\``);
       s.deleteEntry();
     })
     .setUpdateStatusListener(async (s, status: Status) => {
-      log(`Status updated -> ${status}.`);
+      debug(`Status updated -> ${status}.`);
       s.updateVisibility(status);
       if (status == Status.START && !s.isTitleEmpty() && findCurrentEntrySeconds() < 10) {
         notifier.notify((title, client, project, time) => `:tio2: \`開始\`  *${title}*    ${client}${project}`);
