@@ -264,8 +264,8 @@ class TimerContents {
     );
 
     const initContent = `<div style="width: 400px;">
-  <i class="fas fa-circle-notch fa-spin"></i>
-  <span>Loading next tasks from Todoist...</span>
+  <i class="fas fa-circle-notch fa-spin fa-lg"></i>
+  <span style="margin-left: 5px;">Loading next tasks from Todoist...</span>
 </div>`;
     const task2Li = (task: Task, onClickListener): Element => {
       const elm = document.createElement('li');
@@ -281,14 +281,14 @@ class TimerContents {
     tippy(elem, {
       theme: 'light',
       trigger: 'click',
-      maxWidth: 500,
+      maxWidth: 600,
       flipOnUpdate: true,
       interactive: true,
       content: initContent,
       onShow: instance => {
         getTodoistApiToken().then(token => {
           chrome.runtime.sendMessage({ type: 'todoist.fetchDailyTasks', token: token }, async (tasks: Task[]) => {
-            const div = document.createElement('div');
+            const divElm = document.createElement('div');
             const ul = document.createElement('ul');
             const ignoreTodoistProjectIds = await getTodoistIgnoreProjectIds();
             tasks
@@ -309,8 +309,23 @@ class TimerContents {
                 }),
               )
               .forEach(e => ul.appendChild(e));
-            div.appendChild(ul);
-            instance.setContent(div);
+            divElm.appendChild(ul);
+
+            const cleanTodoistSyncTokenButton = div(
+              `<div class="todoist-sync-token-clear-button" style="margin-top: 15px;">
+  <i class="fas fa-trash"></i>
+  <span style="margin-left: 5px;">Todoistのキャッシュをクリアする</span>
+</div>`,
+              'todoist-sync-token-clear-button-div',
+            );
+            cleanTodoistSyncTokenButton.addEventListener('click', () => {
+              chrome.runtime.sendMessage({ type: 'todoist.clearSyncToken' }, () => {
+                instance.hide();
+              });
+            });
+            divElm.appendChild(cleanTodoistSyncTokenButton);
+
+            instance.setContent(divElm);
           });
         });
       },

@@ -41,11 +41,26 @@
 }
 
 .todoist-item:hover {
-  color: orangered;
-  font-size: 105%;
+  color: gold;
   font-weight: bolder;
 }
 
 .joypixels {
   width: 16px;
+}
+
+.todoist-sync-token-clear-button-div {
+  text-align: center;
+  text-size: 90%;
+  color: antiquewhite;
+  padding: 5px 0;
+}
+
+.todoist-sync-token-clear-button {
+  cursor: pointer;
+}
+
+.todoist-sync-token-clear-button:hover {
+  color: violet;
+  font-weight: bolder;
 }

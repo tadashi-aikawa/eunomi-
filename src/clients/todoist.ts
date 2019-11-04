@@ -107,6 +107,10 @@ export class TodoistClient {
     this.token = token;
   }
 
+  clearSyncToken() {
+    this.syncToken = '*';
+  }
+
   /**
    * 本日のタスク一覧を取得します
    * @param token Todoistトークン

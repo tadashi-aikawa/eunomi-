@@ -12,6 +12,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       todoistClient.setToken(request.token);
       todoistClient.closeTask(request.taskId).then(sendResponse);
       return true;
+    case 'todoist.clearSyncToken':
+      todoistClient.clearSyncToken();
+      sendResponse();
+      return true;
     default:
       console.error('Unknown type');
   }
