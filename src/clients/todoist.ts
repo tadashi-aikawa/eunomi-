@@ -86,7 +86,6 @@ export class Task {
     public title: string,
     public projectId: number | null,
     public projectName: string | null,
-    public checked: boolean,
   ) {}
 }
 
@@ -96,7 +95,6 @@ const toTask = (task: Api.Task, projectNameById: NumericDictionary<Api.Project>)
     task.content,
     task.project_id || null,
     task.project_id ? projectNameById[task.project_id].name : null,
-    task.checked === 1,
   );
 
 export class TodoistClient {
@@ -137,10 +135,10 @@ export class TodoistClient {
       .values()
       .filter(x => x.due && x.due.date === today)
       .reject(x => x.is_deleted === 1)
+      .reject(x => x.checked === 1)
       .reject(x => this.projectById[x.project_id] && this.projectById[x.project_id].is_deleted === 1)
       .orderBy(x => x.day_order)
       .map(x => toTask(x, this.projectById))
-      .reject(x => x.checked)
       .value();
   }
 
