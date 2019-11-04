@@ -25,6 +25,7 @@ import {
   getTodoistIgnoreProjectIds,
   getTogglApiToken,
   getTogglWorkspaceId,
+  setCurrentTodoistTaskEmpty,
   setCurrentTodoistTaskId,
   setCurrentTodoistTaskName,
 } from './utils/storage';
@@ -378,8 +379,7 @@ function init(e) {
       if (findEntryTitle() === TogglTitle.fromTodoistTitle(todoistTaskName)) {
         await closeTask(await getTodoistApiToken(), await getCurrentTodoistTaskId());
       }
-      await setCurrentTodoistTaskId(-1);
-      await setCurrentTodoistTaskName('');
+      await setCurrentTodoistTaskEmpty();
 
       s.togglTimerButton.click();
     })

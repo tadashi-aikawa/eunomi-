@@ -81,6 +81,9 @@ export const getCurrentTodoistTaskName = (): Promise<string> => getExtensionStor
 export const setCurrentTodoistTaskName = (value: string): Promise<boolean> =>
   setExtensionStorage('currentTodoistTaskName', value);
 
+export const setCurrentTodoistTaskEmpty = async (): Promise<boolean> =>
+  (await setCurrentTodoistTaskId(-1)) && (await setCurrentTodoistTaskName(''));
+
 export const getPrefixMapping = (): Promise<string> => getExtensionStorage('prefixMapping');
 export const setPrefixMapping = (value: string): Promise<boolean> => setExtensionStorage('prefixMapping', value);
 export const parsePrefixMapping = (): Promise<PrefixMapping> =>
