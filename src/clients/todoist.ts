@@ -1,5 +1,5 @@
 import Axios, { AxiosPromise } from 'axios';
-import _, { Dictionary } from 'lodash';
+import _, { Dictionary, NumericDictionary } from 'lodash';
 import dayjs from 'dayjs';
 
 const BASE = 'https://api.todoist.com/api/v8';
@@ -8,6 +8,8 @@ namespace Api {
   export interface Project {
     id: number;
     name: string;
+    /** 0: 存在する, 1: 消された */
+    is_deleted: number;
   }
 
   interface Due {
@@ -24,10 +26,15 @@ namespace Api {
     parent_id: number | null;
     project_id: number | null;
     due: Due | null;
+    /** 0: 未完了, 1: 完了 */
     checked: number;
+    /** 0: 存在する, 1: 消された */
+    is_deleted: number;
   }
 
   export interface Root {
+    full_sync: boolean;
+    sync_token: string;
     items: Task[];
     projects: Project[];
   }
@@ -82,7 +89,7 @@ export class Task {
   ) {}
 }
 
-const toTask = (task: Api.Task, projectNameById: Dictionary<Api.Project>): Task =>
+const toTask = (task: Api.Task, projectNameById: NumericDictionary<Api.Project>): Task =>
   new Task(
     task.id,
     task.content,
@@ -91,25 +98,55 @@ const toTask = (task: Api.Task, projectNameById: Dictionary<Api.Project>): Task 
     task.checked === 1,
   );
 
-/**
- * 本日のタスク一覧を取得します
- * @param token Todoistトークン
- */
-export async function fetchDailyTasks(token: string): Promise<Task[]> {
-  const client = new Api.Client(token);
-  const res: Api.Root = (await client.sync(['items', 'projects'])).data;
-  const projectNameById: Dictionary<Api.Project> = _.keyBy(res.projects, x => x.id);
+export class TodoistClient {
+  token: string;
+  syncToken: string = '*';
+  projectById: NumericDictionary<Api.Project>;
+  taskById: NumericDictionary<Api.Task>;
 
-  const today = dayjs().format('YYYY-MM-DD');
-  return _(res.items)
-    .filter(x => x.due && x.due.date === today)
-    .orderBy(x => x.day_order)
-    .map(x => toTask(x, projectNameById))
-    .reject(x => x.checked)
-    .value();
-}
+  setToken(token: string) {
+    this.token = token;
+  }
 
-export async function closeTask(token: string, taskId: number): Promise<void> {
-  const client = new RestApi.Client(token);
-  return client.closeTask(taskId).then();
+  /**
+   * 本日のタスク一覧を取得します
+   * @param token Todoistトークン
+   */
+  async fetchDailyTasks(): Promise<Task[]> {
+    const client = new Api.Client(this.token);
+    const res: Api.Root = (await client.sync(['items', 'projects'], this.syncToken)).data;
+    this.syncToken = res.sync_token;
+    console.debug(`res.full_sync: ${res.full_sync}`);
+    console.debug(`syncToken: ${this.syncToken}`);
+
+    const _projectById: NumericDictionary<Api.Project> = _.keyBy(res.projects, x => x.id);
+    const _taskById: NumericDictionary<Api.Task> = _.keyBy(res.items, x => x.id);
+    console.debug('_projectById');
+    console.debug(_projectById);
+    console.debug('_taskById');
+    console.debug(_taskById);
+    if (res.full_sync) {
+      this.projectById = _projectById;
+      this.taskById = _taskById;
+    } else {
+      this.projectById = { ...this.projectById, ..._projectById };
+      this.taskById = { ...this.taskById, ..._taskById };
+    }
+
+    const today = dayjs().format('YYYY-MM-DD');
+    return _(this.taskById)
+      .values()
+      .filter(x => x.due && x.due.date === today)
+      .reject(x => x.is_deleted === 1)
+      .reject(x => this.projectById[x.project_id] && this.projectById[x.project_id].is_deleted === 1)
+      .orderBy(x => x.day_order)
+      .map(x => toTask(x, this.projectById))
+      .reject(x => x.checked)
+      .value();
+  }
+
+  async closeTask(taskId: number): Promise<void> {
+    const client = new RestApi.Client(this.token);
+    return client.closeTask(taskId).then();
+  }
 }

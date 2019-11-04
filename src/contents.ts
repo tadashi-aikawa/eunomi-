@@ -30,9 +30,9 @@ import {
   setCurrentTodoistTaskName,
 } from './utils/storage';
 import { toJapanese } from './utils/time';
-import { toEmojiString, trimBracketContents, trimBracketTime, trimPrefixEmoji } from './utils/string';
+import { toEmojiString, trimBracketContents } from './utils/string';
 import { getClientPrefix, getProjectPrefix } from './utils/prefix';
-import { closeTask, Task } from './clients/todoist';
+import { Task } from './clients/todoist';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import { findProjectId, startTimer, TogglTitle } from './clients/toggl';
@@ -172,19 +172,6 @@ class TimerContents {
     }
   }
 
-  // TODO:
-  // updateEnablity() {
-  //   if (this.isTitleEmpty()) {
-  //     this.pauseButton.setAttribute('style', 'disable: true;');
-  //     this.interruptButton.setAttribute('style', 'disable: true;');
-  //     this.doneButton.setAttribute('style', 'disable: true;');
-  //   } else {
-  //     this.pauseButton.setAttribute('style', 'disable: false;');
-  //     this.interruptButton.setAttribute('style', 'disable: false;');
-  //     this.doneButton.setAttribute('style', 'disable: false;');
-  //   }
-  // }
-
   isTitleEmpty(): boolean {
     return !this.togglTitleInput.getAttribute('value');
   }
@@ -275,7 +262,10 @@ class TimerContents {
       'todoist-button',
     );
 
-    const initContent = `<div style="width: 400px;">Loading next tasks from Todoist...</div>`;
+    const initContent = `<div style="width: 400px;">
+  <i class="fas fa-circle-notch fa-spin"></i>
+  <span>Loading next tasks from Todoist...</span>
+</div>`;
     const task2Li = (task: Task, onClickListener): Element => {
       const elm = document.createElement('li');
       elm.setAttribute('class', 'todoist-item');
@@ -377,7 +367,10 @@ function init(e) {
 
       const todoistTaskName = await getCurrentTodoistTaskName();
       if (findEntryTitle() === TogglTitle.fromTodoistTitle(todoistTaskName)) {
-        await closeTask(await getTodoistApiToken(), await getCurrentTodoistTaskId());
+        chrome.runtime.sendMessage(
+          { type: 'todoist.closeTask', token: await getTodoistApiToken(), taskId: await getCurrentTodoistTaskId() },
+          async () => {},
+        );
       }
       await setCurrentTodoistTaskEmpty();
 
@@ -395,10 +388,6 @@ function init(e) {
         notifier.notify((title, client, project, time) => `:tio2: \`開始\`  *${title}*    ${client}${project}`);
       }
     });
-  // .setUpdateTitleListener(async s => {
-  // TODO:
-  // s.updateEnablity();
-  // });
 }
 
 const initObserver = new MutationObserver(init);
