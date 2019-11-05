@@ -36,8 +36,9 @@ namespace Api {
   export interface Root {
     full_sync: boolean;
     sync_token: string;
-    items: Task[];
-    projects: Project[];
+    items?: Task[];
+    projects?: Project[];
+    day_orders?: Dictionary<number>;
   }
 
   export class Client {
@@ -117,7 +118,7 @@ export class TodoistClient {
    */
   async fetchDailyTasks(): Promise<Task[]> {
     const client = new Api.Client(this.token);
-    const res: Api.Root = (await client.sync(['items', 'projects'], this.syncToken)).data;
+    const res: Api.Root = (await client.sync(['items', 'projects', 'day_orders'], this.syncToken)).data;
     this.syncToken = res.sync_token;
     debug(`res.full_sync: ${res.full_sync}`);
     debug(`syncToken: ${this.syncToken}`);
@@ -132,6 +133,12 @@ export class TodoistClient {
     } else {
       this.projectById = { ...this.projectById, ..._projectById };
       this.taskById = { ...this.taskById, ..._taskById };
+    }
+    if (!_.isEmpty(res.day_orders)) {
+      this.taskById = _.mapValues(this.taskById, task =>
+        res.day_orders[task.id] ? { ...task, day_order: res.day_orders[task.id] } : task,
+      );
+      debug('taskById sorted', this.taskById);
     }
 
     const today = dayjs().format('YYYY-MM-DD');
