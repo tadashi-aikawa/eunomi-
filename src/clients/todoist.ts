@@ -134,11 +134,11 @@ export class TodoistClient {
       this.projectById = { ...this.projectById, ..._projectById };
       this.taskById = { ...this.taskById, ..._taskById };
     }
+    debug('_dayOrders', res.day_orders);
     if (!_.isEmpty(res.day_orders)) {
       this.taskById = _.mapValues(this.taskById, task =>
         res.day_orders[task.id] ? { ...task, day_order: res.day_orders[task.id] } : task,
       );
-      debug('taskById sorted', this.taskById);
     }
 
     const today = dayjs().format('YYYY-MM-DD');
