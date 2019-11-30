@@ -144,10 +144,10 @@ export class TodoistClient {
     const today = dayjs().format('YYYY-MM-DD');
     return _(this.taskById)
       .values()
-      .filter(x => x.due && x.due.date === today)
+      .filter(x => x.due?.date === today)
       .reject(x => x.is_deleted === 1)
       .reject(x => x.checked === 1)
-      .reject(x => this.projectById[x.project_id] && this.projectById[x.project_id].is_deleted === 1)
+      .reject(x => this.projectById[x.project_id]?.is_deleted === 1)
       .orderBy(x => x.day_order)
       .map(x => toTask(x, this.projectById))
       .value();
