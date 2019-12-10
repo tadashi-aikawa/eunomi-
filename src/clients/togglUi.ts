@@ -5,7 +5,7 @@ import { toSeconds } from '../utils/time';
 const findTitleElement = (): HTMLTitleElement => pick('html > head > title');
 
 // 実行中エントリのタイトル
-const TIME_ENTRY_TITLE_SELECTOR = '.TimerContainer__timerContainer form > input';
+const TIME_ENTRY_TITLE_SELECTOR = '.PopdownV2__outside > div > form > input';
 export const findEntryTitleElement = (): HTMLInputElement => pick(TIME_ENTRY_TITLE_SELECTOR);
 export const findEntryTitle = (): string => findEntryTitleElement().getAttribute('value');
 
