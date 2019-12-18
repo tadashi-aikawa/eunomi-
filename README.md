@@ -7,6 +7,28 @@ A Google Chrome extension for Toggl and Owl! :owl:
 
 <img src="./public/icon.png" width=200 />
 
+## Configuration
+
+### Prefix mapping YAML
+
+```
+event:
+  start: ":emoji_start:"
+  done: ":emoji_done:"
+  pause: "emoji_pause"
+  interrupt: "emoji_interrup"
+  force_stop: "emoji_force_stop"
+  delete: "emoji_delete"
+
+client:
+  "your_client1": ":emoji1:"
+  "your_client2": ":emoji2:"
+
+project:
+  "your_project1": ":emoji1:"
+  "your_project2": ":emoji2:"
+```
+
 ## Development
 
 ```bash

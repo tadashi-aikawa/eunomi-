@@ -25,7 +25,17 @@ const DEFAULT_STORAGE: Storage = {
   currentTodoistTaskName: '',
 };
 
+export interface EventPrefix {
+  start: string;
+  done: string;
+  pause: string;
+  interrupt: string;
+  force_stop: string;
+  delete: string;
+}
+
 export interface PrefixMapping {
+  event?: EventPrefix;
   client?: { [clentId: string]: string };
   project?: { [projectId: string]: string };
 }

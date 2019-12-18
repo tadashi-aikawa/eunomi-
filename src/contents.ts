@@ -31,7 +31,7 @@ import {
 } from './utils/storage';
 import { toJapanese } from './utils/time';
 import { toEmojiString, trimBracketContents } from './utils/string';
-import { getClientPrefix, getProjectPrefix } from './utils/prefix';
+import { getClientPrefix, getEventPrefix, getProjectPrefix } from './utils/prefix';
 import { Task } from './clients/todoist';
 import tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
@@ -359,25 +359,32 @@ function init(e) {
     .setOnClickPauseButtonListener(async s => {
       debug('Pause button clicked.');
       notifier.notify(
-        (title, client, project, time) => `:zzz_kirby: \`中断\` ${time}  *${title}*    ${client}${project}`,
+        (title, client, project, time) =>
+          `${getEventPrefix().pause} \`中断\` ${time}  *${title}*    ${client}${project}`,
       );
       s.togglTimerButton.click();
     })
     .setOnClickInterruptButtonListener(async s => {
       debug('Interrupt button clicked.');
-      notifier.notify((title, client, project, time) => `:denwaneko: \`割込発生\`:fukidashi3::doushite:`);
+      notifier.notify(
+        (title, client, project, time) => `${getEventPrefix().interrupt} \`割込発生\`:fukidashi3::doushite:`,
+      );
 
       s.togglTimerButton.click();
 
       notifier.notify(
-        (title, client, project, time) => `　:genbaneko: \`強制中断\` ${time}  *${title}*    ${client}${project}`,
+        (title, client, project, time) =>
+          `　${getEventPrefix().force_stop} \`強制中断\` ${time}  *${title}*    ${client}${project}`,
       );
 
       setTimeout(() => s.togglTimerButton.click(), 1000);
     })
     .setOnClickDoneButtonListener(async s => {
       debug('Done button clicked.');
-      notifier.notify((title, client, project, time) => `:renne: \`完了\` ${time}  *${title}*    ${client}${project}`);
+      notifier.notify(
+        (title, client, project, time) =>
+          `${getEventPrefix().done} \`完了\` ${time}  *${title}*    ${client}${project}`,
+      );
 
       const todoistTaskName = await getCurrentTodoistTaskName();
       if (findEntryTitle() === TogglTitle.fromTodoistTitle(todoistTaskName)) {
@@ -392,14 +399,16 @@ function init(e) {
     })
     .setOnClickDeleteButtonListener(async s => {
       debug('Delete button clicked.');
-      notifier.notify((title, client, project, time) => `:unitychan_ng: \`やっぱナシ\``);
+      notifier.notify((title, client, project, time) => `${getEventPrefix().delete} \`やっぱナシ\``);
       s.deleteEntry();
     })
     .setUpdateStatusListener(async (s, status: Status) => {
       debug(`Status updated -> ${status}.`);
       s.updateVisibility(status);
       if (status == Status.START && !s.isTitleEmpty() && findCurrentEntrySeconds() < 10) {
-        notifier.notify((title, client, project, time) => `:tio2: \`開始\`  *${title}*    ${client}${project}`);
+        notifier.notify(
+          (title, client, project, time) => `${getEventPrefix().start} \`開始\`  *${title}*    ${client}${project}`,
+        );
       }
     });
 }
