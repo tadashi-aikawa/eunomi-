@@ -15,10 +15,10 @@ A Google Chrome extension for Toggl and Owl! :owl:
 event:
   start: ":emoji_start:"
   done: ":emoji_done:"
-  pause: "emoji_pause"
-  interrupt: "emoji_interrup"
-  force_stop: "emoji_force_stop"
-  delete: "emoji_delete"
+  pause: ":emoji_pause:"
+  interrupt: ":emoji_interrup:"
+  force_stop: ":emoji_force_stop:"
+  delete: ":emoji_delete:"
 
 client:
   "your_client1": ":emoji1:"
