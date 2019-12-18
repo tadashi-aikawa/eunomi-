@@ -26,8 +26,8 @@ const DEFAULT_STORAGE: Storage = {
 };
 
 export interface PrefixMapping {
-  client: { [clentId: string]: string };
-  project: { [projectId: string]: string };
+  client?: { [clentId: string]: string };
+  project?: { [projectId: string]: string };
 }
 
 function setExtensionStorage<T>(key: keyof Storage, value: T): Promise<boolean> {
@@ -87,4 +87,4 @@ export const setCurrentTodoistTaskEmpty = async (): Promise<boolean> =>
 export const getPrefixMapping = (): Promise<string> => getExtensionStorage('prefixMapping');
 export const setPrefixMapping = (value: string): Promise<boolean> => setExtensionStorage('prefixMapping', value);
 export const parsePrefixMapping = (): Promise<PrefixMapping> =>
-  getExtensionStorage('prefixMapping').then(yaml.safeLoad);
+  getExtensionStorage('prefixMapping').then(x => yaml.safeLoad(x) ?? {});
