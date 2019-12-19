@@ -27,6 +27,8 @@ namespace Api {
     parent_id: number | null;
     project_id: number | null;
     due: Due | null;
+    /** 0: 通常 ～ 4: 緊急 */
+    priority: number;
     /** 0: 未完了, 1: 完了 */
     checked: number;
     /** 0: 存在する, 1: 消された */
@@ -150,6 +152,7 @@ export class TodoistClient {
       .reject(x => x.checked === 1)
       .reject(x => this.projectById[x.project_id]?.is_deleted === 1)
       .orderBy(x => x.day_order)
+      .orderBy(x => x.priority, 'desc')
       .map(x => toTask(x, this.projectById))
       .value();
   }
