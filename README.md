@@ -49,5 +49,5 @@ TODO: Use `npm run build` instead of `npm run dev-build` if it works.
 
 ## Version up
 
-1. `npm version ...`
-2. Update version in `manifest.json`
+1. Update version in `manifest.json`
+2. `npm version ...`
