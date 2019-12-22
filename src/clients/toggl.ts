@@ -1,7 +1,7 @@
 import Axios, { AxiosPromise } from 'axios';
 import _ from 'lodash';
 import { toJapaneseFromSecond } from '../utils/time';
-import { trimBracketTime, trimPrefixEmoji } from '../utils/string';
+import { trimBracketDate, trimBracketTime, trimPrefixEmoji } from '../utils/string';
 
 const BASE = 'https://toggl.com/api/v8';
 
@@ -94,7 +94,7 @@ namespace ReportApi {
 // vo...
 export class TogglTitle extends String {
   static fromTodoistTitle(todoistTitle: string): TogglTitle {
-    return trimPrefixEmoji(trimBracketTime(todoistTitle));
+    return trimPrefixEmoji(trimBracketTime(trimBracketDate(todoistTitle)));
   }
 }
 
